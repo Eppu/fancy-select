@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="normalize.css">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="fancy-select.css">
+  <title>Document</title>
+</head>
+<body>
+  <main>
+    <h1>Fancy Select</h1>
+
+    <div>
+      I would like to
+      <div class="fancy-select">
+        <select name="verb" id="fancy-select__verb">
+          <option value="sell">sell</option>
+          <option value="buy">buy</option>
+          <option value="repair">repair</option>
+          <option value="donate">donate</option>
+        </select>
+      </div>
+      a used camera.
+    </div>
+
+    <div class="fs-select">
+      <span>I would like to </span>
+      
+      <div class="fs-options">
+        <ul class="fs-options-list" data-name="verb">
+          <li data-value="sell">sell</li>
+          <li data-value="buy">buy</li>
+          <li data-value="repair">repair</li>
+          <li data-value="donate">donate</li>
+        </ul>
+      </div>
+      <span> a </span> 
+      <div class="fs-options">
+        <ul class="fs-options-list">
+          <li>used</li>
+          <li>broken</li>
+        </ul>
+      </div>
+      <div class="fs-options">
+        <ul class="fs-options-list">
+          <li>film camera</li>
+          <li>digital camera</li>
+          <li>lens</li>
+        </ul>
+      </div>
+      <span>.</span>
+    </div>
+  </main>
+
+  <script src="docready.js"></script>
+  <script src="fancy-select.js"></script> 
+</body>
+</html>

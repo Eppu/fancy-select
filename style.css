@@ -1,0 +1,14 @@
+body {
+  background-color: #444444;
+}
+
+main {
+  position: absolute;
+  left: 20%;
+  right: 20%;
+  top: 20%;
+  bottom: 20%;
+  background: white;
+  padding: 2em;
+  text-align: center;
+}
