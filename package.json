@@ -9,7 +9,9 @@
   },
   "author": "Misacorp",
   "license": "MIT",
-  "dependencies": {},
+  "dependencies": {
+    "material-design-icons": "^3.0.1"
+  },
   "devDependencies": {
     "connect": "^3.6.6",
     "serve-static": "^1.13.2"

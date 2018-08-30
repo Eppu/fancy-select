@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="normalize.css">
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="fancy-select.css">
-  <title>Document</title>
+  <title>Fancy Select</title>
 </head>
 <body>
   <main>
@@ -16,41 +16,76 @@
     <div>
       I would like to
       <div class="fancy-select">
-        <select name="verb" id="fancy-select__verb">
-          <option value="sell">sell</option>
+        <select name="verb" class="fs-select-origin">
+          <option value="sell" selected>sell</option>
           <option value="buy">buy</option>
           <option value="repair">repair</option>
           <option value="donate">donate</option>
         </select>
       </div>
-      a used camera.
+      a 
+      <div class="fancy-select">
+        <select name="adjective" class="fs-select-origin">
+          <option value="used" selected>used</option>
+          <option value="broken">broken</option>
+        </select>
+      </div>
+      <div class="fancy-select">
+        <select name="noun" class="fs-select-origin">
+          <option value="film_camera" selected>film camera</option>
+          <option value="digital_camera">digital camera</option>
+          <option value="lens">lens</option>
+        </select>
+      </div>
+      .
     </div>
 
-    <div class="fs-select">
+    <div class="fs-select-container">
       <span>I would like to </span>
-      
-      <div class="fs-options">
-        <ul class="fs-options-list" data-name="verb">
-          <li data-value="sell">sell</li>
-          <li data-value="buy">buy</li>
-          <li data-value="repair">repair</li>
-          <li data-value="donate">donate</li>
-        </ul>
+
+
+
+
+
+      <div class="fs-select" data-name="verb">
+        <span class="fs-placeholder">Placeholder</span>
+        <div class="fs-options">
+          <ul class="fs-options-list">
+            <li data-value="sell">sell</li>
+            <li data-value="buy">buy</li>
+            <li data-value="repair">repair</li>
+            <li data-value="donate">donate</li>
+          </ul>
+        </div>
       </div>
+
+
+
+
       <span> a </span> 
-      <div class="fs-options">
-        <ul class="fs-options-list">
-          <li>used</li>
-          <li>broken</li>
-        </ul>
+
+
+      <div class="fs-select" data-name="adjective">
+        <span class="fs-placeholder">Placeholder</span>
+        <div class="fs-options">
+          <ul class="fs-options-list">
+            <li data-value="used">used</li>
+            <li data-value="broken">broken</li>
+          </ul>
+        </div>
       </div>
-      <div class="fs-options">
-        <ul class="fs-options-list">
-          <li>film camera</li>
-          <li>digital camera</li>
-          <li>lens</li>
-        </ul>
+
+      <div class="fs-select" data-name="noun">
+        <span class="fs-placeholder">Placeholder</span>
+        <div class="fs-options">
+          <ul class="fs-options-list">
+            <li data-value="film_camera">film camera</li>
+            <li data-value="digital_camera">digital camera</li>
+            <li data-value="lens">lens</li>
+          </ul>
+        </div>
       </div>
+
       <span>.</span>
     </div>
   </main>
