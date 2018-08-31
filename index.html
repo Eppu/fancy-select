@@ -13,7 +13,10 @@
   <main>
     <h1>Fancy Select</h1>
 
-    <div>
+    <div class="color-select light"></div>
+    <div class="color-select dark active"></div>
+
+    <div id="native-select" style="display: none;">
       I would like to
       <div class="fancy-select">
         <select name="verb" class="fs-select-origin">
@@ -40,14 +43,11 @@
       .
     </div>
 
-    <div class="fs-select-container">
+    <!-- First element -->
+    <div class="fs-select-container dark">
       <span>I would like to </span>
 
-
-
-
-
-      <div class="fs-select" data-name="verb">
+      <div class="fs-select" data-name="verb" data-width="7.5">
         <span class="fs-placeholder">Placeholder</span>
         <div class="fs-options">
           <ul class="fs-options-list">
@@ -59,13 +59,9 @@
         </div>
       </div>
 
-
-
-
       <span> a </span> 
 
-
-      <div class="fs-select" data-name="adjective">
+      <div class="fs-select" data-name="adjective" data-width="7.5">
         <span class="fs-placeholder">Placeholder</span>
         <div class="fs-options">
           <ul class="fs-options-list">
@@ -75,7 +71,7 @@
         </div>
       </div>
 
-      <div class="fs-select" data-name="noun">
+      <div class="fs-select" data-name="noun" data-width="11">
         <span class="fs-placeholder">Placeholder</span>
         <div class="fs-options">
           <ul class="fs-options-list">
@@ -85,12 +81,64 @@
           </ul>
         </div>
       </div>
+    </div>
 
-      <span>.</span>
+    <!-- Second element -->
+    <div class="fs-select-container light" style="display: none;">
+      <span>I would like to </span>
+
+      <div class="fs-select" data-name="verb" data-width="7.5">
+        <span class="fs-placeholder">Placeholder</span>
+        <div class="fs-options">
+          <ul class="fs-options-list">
+            <li data-value="sell">sell</li>
+            <li data-value="buy">buy</li>
+            <li data-value="repair">repair</li>
+            <li data-value="donate">donate</li>
+          </ul>
+        </div>
+      </div>
+
+      <span> a </span>
+
+      <div class="fs-select" data-name="adjective" data-width="7.5">
+        <span class="fs-placeholder">Placeholder</span>
+        <div class="fs-options">
+          <ul class="fs-options-list">
+            <li data-value="used">used</li>
+            <li data-value="broken">broken</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="fs-select" data-name="noun" data-width="11">
+        <span class="fs-placeholder">Placeholder</span>
+        <div class="fs-options">
+          <ul class="fs-options-list">
+            <li data-value="film_camera">film camera</li>
+            <li data-value="digital_camera">digital camera</li>
+            <li data-value="lens">lens</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="fs-go-container">
+      <div class="fs-go">
+        <div class="fs-go-sparks">
+          <div class="fs-go-spark" style="top: 16%"></div>
+          <div class="fs-go-spark" style="top: 33%"></div>
+          <div class="fs-go-spark" style="top: 50%"></div>
+          <div class="fs-go-spark" style="top: 66%"></div>
+          <div class="fs-go-spark" style="top: 84%"></div>
+        </div>
+        <span>GO</span>
+      </div>
     </div>
   </main>
-
+    
   <script src="docready.js"></script>
+  <script src="script.js"></script>
   <script src="fancy-select.js"></script> 
 </body>
 </html>

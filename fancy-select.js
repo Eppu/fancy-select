@@ -87,10 +87,68 @@ window.docReady(function() {
 
       // Update placeholder with newly found text
       placeholders[i].innerHTML = selectValue;
+
+      // Update styling on the <li> element if it matches the current value
+      var listElements = parent.querySelectorAll('.fs-options .fs-options-list li');
+      for (var j = 0; j < listElements.length; j++) {
+        if (listElements[j].textContent === selectValue) {
+          listElements[j].style.color = '#777777';
+        } else {
+          listElements[j].removeAttribute('style');
+        }
+      }
+    }
+  }
+
+  /**
+   * Initialize all fancy-select element sizes.
+   * - Width is calculated from the data-width property set in each element
+   * - Height is calculated from the number of options each element has
+   */
+  function initializeSelectSizes() {
+    /* WIDTH */
+    // Set fancy-select element widths from their data-width properties
+    var fancySelects = document.getElementsByClassName('fs-select');
+    for (var i = 0; i < fancySelects.length; i++) {
+      // Read target width from data-width attribute
+      var targetWidth = fancySelects[i].attributes['data-width'].value;
+
+      // Apply width as a style
+      fancySelects[i].style.width = targetWidth + 'em';
+    }
+
+    /* HEIGHT */
+    // Set how high each .fs-select::before element is based on how many options it contains
+    // Start by dynamically creating an empty stylesheet at the document head
+    var styleElem = document.head.appendChild(document.createElement('style'));
+
+    // Then loop through all the fancy-selects
+    for (var i = 0; i < fancySelects.length; i++) {
+      var current = fancySelects[i];
+      // Count number of list elements it has as children
+      var count = current.querySelectorAll('.fs-options .fs-options-list li').length;
+      
+      // Give the current fancy-select a unique ID
+      var id = 'fs-unique-' + i;
+      // To make sure the ID is unique, keep giving it a suffix number until no similar ids are found within the document
+      var iteration = 0;
+      while (document.getElementById(id) !== null) {
+        id = 'fs-unique-' + i + '-' + iteration;
+      }
+      current.setAttribute('id', id);
+
+      // Add an entry to our new stylesheet (in the page head) concerning the ::before element of our fancy-select
+      var activeWidth = 1;
+      var activeHeight = count / 1.25;
+      var selector = '#' + id + '.fs-active::before';
+      var style = '{ transform: scale(' + activeWidth +', ' + activeHeight + '); }'
+      styleElem.innerHTML = styleElem.innerHTML + selector + style;
     }
   }
 
 
+  // Initialize fancy-select element sizes
+  initializeSelectSizes();
 
   // Update placeholder texts to select element values
   updatePlaceholders();

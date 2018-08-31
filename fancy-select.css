@@ -15,22 +15,32 @@
   font-family: 'Montserrat', sans-serif;
 }
 
+.fs-select-container {
+  padding: 2em;
+  margin-top: 4em;
+  background-color: black;
+  color: white;
+}
+
+/* Light theme */
+.fs-select-container.light { background-color: white; color: black; }
+
 .fs-select {
   display: inline-block;
   position: relative;
   vertical-align: middle;
   text-align: left;
   z-index: 0;
-  text-transform: uppercase;
   color: white;
-  font-weight: 800;
+  /* text-transform: uppercase; */
+  /* font-weight: 800; */
   cursor: pointer;
-  width: 150px;
+  min-width: 100px;
 }
 
 .fs-select::before {
   content: '';
-  background-color: darkslateblue;
+  background-color: #202020;
   position: absolute;
   left: 0;
   top: 0;
@@ -42,8 +52,13 @@
 }
 
 .fs-select.fs-active::before {
-  transform: scale(1.1, 3);
+  /* This value is primarily controlled by Javascript. It's existence here is a fallback */
+  transform: scale(1, 3);
 }
+
+/* fs-select color themes */
+.fs-select-container.light .fs-select { color: black; }
+.fs-select-container.light .fs-select::before { background-color: #F0F0F0; }
 
 .fs-placeholder {
   position: relative;
@@ -77,9 +92,11 @@
 .fs-options {
   position: absolute;
   overflow: hidden;
+  visibility: hidden;
   top: 50%;
-  left: 50%;
-  transform: translate(-50%,-50%);
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
   padding: 1em 0;
 }
 
@@ -96,10 +113,11 @@
 }
 
 .fs-options-list li {
-  padding: 0.3em 1.5em;
+  padding: 0.3em 1.75em 0.3em 1em;
   color: white;
   transform: translateX(50%);
   opacity: 0;
+  visibility: hidden;
   transition:
     transform ease-out 150ms,
     opacity 0ms
@@ -108,9 +126,13 @@
   text-overflow: ellipsis;
 }
 
+/* Light theme */
+.fs-select-container.light .fs-options-list li { color: black; }
+
 .fs-select.fs-active .fs-options-list li {
   pointer-events: initial;
   opacity: 1;
+  visibility: visible;
   transform: translateX(0);
   transition:
     transform ease-out 150ms,
@@ -141,6 +163,109 @@
 .fs-select.fs-active .fs-options-list li:nth-of-type(4) { transition-delay: calc(4 * 0.06s); }
 .fs-select.fs-active .fs-options-list li:nth-of-type(5) { transition-delay: calc(5 * 0.06s); }
 
-.fs-options-list li:hover {
-  color: orange;
+/* Hover colors for list elements */
+.fs-options-list li:hover { color: #DADADA; }
+.fs-select-container.light .fs-options-list li:hover { color: #666666; }
+
+.fs-go-container {
+  display: block;
+  margin: 2rem;
+}
+
+.fs-go {
+  display: inline-block;
+  font-size: 5em;
+  font-weight: 800;
+  color: white;
+  background-color: black;
+  padding: 1rem 7rem;
+  cursor: pointer;
+  position: relative;
+
+  z-index: 0;
+
+  transform: scale(1, 1);
+  transition: transform ease-out 150ms;
+}
+
+.fs-go:hover {
+  transform: scale(1.1, 1.1);
+}
+
+.fs-go::after {
+  content: '';
+  left: 5px;
+  right: 5px;
+  bottom: 0;
+  top: 100%;
+  background-color: rgba(0,0,0,0.15);
+  position: absolute;
+  transition: bottom ease-out 150ms;
+}
+
+.fs-go:hover::after {
+  bottom: -5px;
+}
+
+.fs-go-sparks {
+  overflow: hidden;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.fs-go-spark {
+  width: 200px;
+  height: 2px;
+  pointer-events: none;
+  user-select: none;
+  position: absolute;
+  left: 0;
+  transform: translateX(50vw);
+  z-index: 0;
+
+  visibility: hidden;
+  
+  background: -moz-linear-gradient(left, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%); /* FF3.6-15 */
+  background: -webkit-linear-gradient(left, rgba(255,255,255,1) 0%,rgba(255,255,255,0) 100%); /* Chrome10-25,Safari5.1-6 */
+  background: linear-gradient(to right, rgba(255,255,255,1) 0%,rgba(255,255,255,0) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#00ffffff',GradientType=1 ); /* IE6-9 */
+
+  animation-name: spark;
+  animation-duration: 1s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+
+.fs-go-spark::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  background-color: white;
+  /* border-radius: 50%; */
+  position: absolute;
+  left: 0;
+  top: 1px;
+  transform: translateY(-50%) rotate(45deg);
+}
+
+.fs-go:hover .fs-go-spark {
+  visibility: visible;
+}
+
+.fs-go .fs-go-spark:nth-of-type(1) { animation-delay: 0.3s; }
+.fs-go .fs-go-spark:nth-of-type(2) { animation-delay: 0.1s; }
+.fs-go .fs-go-spark:nth-of-type(3) { animation-delay: 0.8s; }
+.fs-go .fs-go-spark:nth-of-type(4) { animation-delay: 0.5s; }
+.fs-go .fs-go-spark:nth-of-type(5) { animation-delay: 0.9s; }
+
+.fs-go span {
+  z-index: 1;
+}
+
+@keyframes spark {
+  from { transform: translateX(50vw); }
+  to { transform: translateX(calc(-50vw - 100%)); }
 }

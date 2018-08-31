@@ -1,14 +1,30 @@
 body {
-  background-color: #444444;
+  background-color: white;
 }
 
 main {
-  position: absolute;
-  left: 20%;
-  right: 20%;
-  top: 20%;
-  bottom: 20%;
   background: white;
-  padding: 2em;
+  padding: 2em 0;
   text-align: center;
+}
+
+.color-select {
+  width: 25px;
+  height: 25px;
+  border: 1px solid #777777;
+  margin: 0.1em;
+  cursor: pointer;
+  display: inline-block;
+  box-sizing: border-box;
+}
+
+.color-select:hover, .color-select.active { border-width: 2px; }
+.color-select:active { border-width: 3px; }
+
+.color-select.light { background-color: white; }
+.color-select.dark { background-color: black; }
+
+.fs-select-origin,
+.fancy-select {
+  display: inline-block;
 }
