@@ -3,16 +3,29 @@
   font-family: 'Material Icons';
   font-style: normal;
   font-weight: 400;
-  src: url(./node_modules/material-design-icons/iconfont/MaterialIcons-Regular.eot); /* For IE6-8 */
+  src: url(./assets/fonts/MaterialIcons-Regular.eot); /* For IE6-8 */
   src: local('Material Icons'),
     local('MaterialIcons-Regular'),
-    url(./node_modules/material-design-icons/iconfont/MaterialIcons-Regular.woff2) format('woff2'),
-    url(./node_modules/material-design-icons/iconfont/MaterialIcons-Regular.woff) format('woff'),
-    url(./node_modules/material-design-icons/iconfont/MaterialIcons-Regular.ttf) format('truetype');
+    url(./assets/fonts/MaterialIcons-Regular.woff2) format('woff2'),
+    url(./assets/fonts/MaterialIcons-Regular.woff) format('woff'),
+    url(./assets/fonts/MaterialIcons-Regular.ttf) format('truetype');
 }
 
 * {
   font-family: 'Montserrat', sans-serif;
+  /* -webkit-transition: all 500ms cubic-bezier(0.100, 0.440, 0.430, 0.970); 
+  -moz-transition: all 500ms cubic-bezier(0.100, 0.440, 0.430, 0.970); 
+  -o-transition: all 500ms cubic-bezier(0.100, 0.440, 0.430, 0.970); 
+  transition: all 500ms cubic-bezier(0.100, 0.440, 0.430, 0.970); */
+
+  -webkit-transition-timing-function: cubic-bezier(0.100, 0.440, 0.430, 0.970); 
+  -o-transition-timing-function: cubic-bezier(0.100, 0.440, 0.430, 0.970); 
+  transition-timing-function: cubic-bezier(0.100, 0.440, 0.430, 0.970); /* custom */
+
+  -webkit-transition-duration: 250ms;
+  -moz-transtion-duration: 250ms;
+  -o-transition-duration: 250m;
+  transition-duration: 250ms;
 }
 
 .fs-select-container {
@@ -47,12 +60,20 @@
   width: 100%;
   height: 100%;
   z-index: -1;
+
+  -webkit-transform: scale(1, 1);
+  -ms-transform: scale(1, 1);
   transform: scale(1, 1);
-  transition: transform ease-out 150ms;
+
+  -webkit-transition: -webkit-transform cubic-bezier(0.100, 0.440, 0.430, 0.970) 250ms;
+  -o-transition: -o-transform cubic-bezier(0.100, 0.440, 0.430, 0.970) 250ms;
+  transition: -webkit-transform cubic-bezier(0.100, 0.440, 0.430, 0.970) 250ms;
 }
 
 .fs-select.fs-active::before {
   /* This value is primarily controlled by Javascript. It's existence here is a fallback */
+  -webkit-transform: scale(1, 3);
+  -ms-transform: scale(1, 3);
   transform: scale(1, 3);
 }
 
@@ -65,23 +86,36 @@
   display: block;
   padding: 1em;
   opacity: 1;
-  transform: translateX(0);
+  -webkit-transform: translateX(0);
+      -ms-transform: translateX(0);
+          transform: translateX(0);
+  -webkit-transition:
+    text-indent cubic-bezier(0.100, 0.440, 0.430, 0.970) 250ms,
+    -webkit-transform cubic-bezier(0.100, 0.440, 0.430, 0.970) 250ms;
+  -o-transition:
+    transform cubic-bezier(0.100, 0.440, 0.430, 0.970) 250ms,
+    text-indent cubic-bezier(0.100, 0.440, 0.430, 0.970) 250ms
+  ;
   transition:
-    transform ease-out 150ms,
-    text-indent ease-out 150ms
+    transform cubic-bezier(0.100, 0.440, 0.430, 0.970) 250ms,
+    text-indent cubic-bezier(0.100, 0.440, 0.430, 0.970) 250ms
   ;
   white-space: nowrap;
-  text-overflow: ellipsis;
+  -o-text-overflow: ellipsis;
+     text-overflow: ellipsis;
   overflow: hidden;
 }
 
 .fs-placeholder::after {
+  /* keyboard down */
   content: '\e313';
   font-family: 'Material Icons';
   position: absolute;
   right: 1em;
   top: 50%;
-  transform: translateY(-50%);
+  -webkit-transform: translateY(-50%);
+      -ms-transform: translateY(-50%);
+          transform: translateY(-50%);
 }
 
 .fs-select.fs-active .fs-placeholder {
@@ -96,7 +130,9 @@
   top: 50%;
   left: 0;
   right: 0;
-  transform: translateY(-50%);
+  -webkit-transform: translateY(-50%);
+      -ms-transform: translateY(-50%);
+          transform: translateY(-50%);
   padding: 1em 0;
 }
 
@@ -115,15 +151,25 @@
 .fs-options-list li {
   padding: 0.3em 1.75em 0.3em 1em;
   color: white;
-  transform: translateX(50%);
+  -webkit-transform: translateX(50%);
+      -ms-transform: translateX(50%);
+          transform: translateX(50%);
   opacity: 0;
   visibility: hidden;
+  -webkit-transition:
+    opacity cubic-bezier(0.100, 0.440, 0.430, 0.970) 250ms,
+    -webkit-transform cubic-bezier(0.100, 0.440, 0.430, 0.970) 250ms;
+  -o-transition:
+    transform cubic-bezier(0.100, 0.440, 0.430, 0.970) 250ms,
+    opacity cubic-bezier(0.100, 0.440, 0.430, 0.970) 250ms
+  ;
   transition:
-    transform ease-out 150ms,
-    opacity 0ms
+    transform cubic-bezier(0.100, 0.440, 0.430, 0.970) 250ms,
+    opacity cubic-bezier(0.100, 0.440, 0.430, 0.970) 250ms
   ;
   white-space: nowrap;
-  text-overflow: ellipsis;
+  -o-text-overflow: ellipsis;
+     text-overflow: ellipsis;
 }
 
 /* Light theme */
@@ -133,10 +179,19 @@
   pointer-events: initial;
   opacity: 1;
   visibility: visible;
-  transform: translateX(0);
+  -webkit-transform: translateX(0);
+      -ms-transform: translateX(0);
+          transform: translateX(0);
+  -webkit-transition:
+    opacity cubic-bezier(0.100, 0.440, 0.430, 0.970) 250ms,
+    -webkit-transform cubic-bezier(0.100, 0.440, 0.430, 0.970) 250ms;
+  -o-transition:
+    transform cubic-bezier(0.100, 0.440, 0.430, 0.970) 250ms,
+    opacity cubic-bezier(0.100, 0.440, 0.430, 0.970) 250ms
+  ;
   transition:
-    transform ease-out 150ms,
-    opacity ease-out 150ms  
+    transform cubic-bezier(0.100, 0.440, 0.430, 0.970) 250ms,
+    opacity cubic-bezier(0.100, 0.440, 0.430, 0.970) 250ms
   ;
 }
 
@@ -150,18 +205,18 @@
 
 
 /* Animate out delays */
-.fs-options li:nth-of-type(1) { transition-delay: 0; }
-.fs-options li:nth-of-type(2) { transition-delay: 0; }
-.fs-options li:nth-of-type(3) { transition-delay: 0; }
-.fs-options li:nth-of-type(4) { transition-delay: 0; }
-.fs-options li:nth-of-type(5) { transition-delay: 0; }
+.fs-options li:nth-of-type(1) { -webkit-transition-delay: 0; -o-transition-delay: 0; transition-delay: 0; }
+.fs-options li:nth-of-type(2) { -webkit-transition-delay: 0; -o-transition-delay: 0; transition-delay: 0; }
+.fs-options li:nth-of-type(3) { -webkit-transition-delay: 0; -o-transition-delay: 0; transition-delay: 0; }
+.fs-options li:nth-of-type(4) { -webkit-transition-delay: 0; -o-transition-delay: 0; transition-delay: 0; }
+.fs-options li:nth-of-type(5) { -webkit-transition-delay: 0; -o-transition-delay: 0; transition-delay: 0; }
 
 /* Animate out delays */
-.fs-select.fs-active .fs-options-list li:nth-of-type(1) { transition-delay: calc(1 * 0.06s); }
-.fs-select.fs-active .fs-options-list li:nth-of-type(2) { transition-delay: calc(2 * 0.06s); }
-.fs-select.fs-active .fs-options-list li:nth-of-type(3) { transition-delay: calc(3 * 0.06s); }
-.fs-select.fs-active .fs-options-list li:nth-of-type(4) { transition-delay: calc(4 * 0.06s); }
-.fs-select.fs-active .fs-options-list li:nth-of-type(5) { transition-delay: calc(5 * 0.06s); }
+.fs-select.fs-active .fs-options-list li:nth-of-type(1) { -webkit-transition-delay: -webkit-calc(1 * 0.06s); -o-transition-delay: calc(1 * 0.06s); transition-delay: calc(1 * 0.06s); }
+.fs-select.fs-active .fs-options-list li:nth-of-type(2) { -webkit-transition-delay: -webkit-calc(2 * 0.06s); -o-transition-delay: calc(2 * 0.06s); transition-delay: calc(2 * 0.06s); }
+.fs-select.fs-active .fs-options-list li:nth-of-type(3) { -webkit-transition-delay: -webkit-calc(3 * 0.06s); -o-transition-delay: calc(3 * 0.06s); transition-delay: calc(3 * 0.06s); }
+.fs-select.fs-active .fs-options-list li:nth-of-type(4) { -webkit-transition-delay: -webkit-calc(4 * 0.06s); -o-transition-delay: calc(4 * 0.06s); transition-delay: calc(4 * 0.06s); }
+.fs-select.fs-active .fs-options-list li:nth-of-type(5) { -webkit-transition-delay: -webkit-calc(5 * 0.06s); -o-transition-delay: calc(5 * 0.06s); transition-delay: calc(5 * 0.06s); }
 
 /* Hover colors for list elements */
 .fs-options-list li:hover { color: #DADADA; }
@@ -184,12 +239,20 @@
 
   z-index: 0;
 
-  transform: scale(1, 1);
-  transition: transform ease-out 150ms;
+  -webkit-transform: scale(1, 1);
+
+      -ms-transform: scale(1, 1);
+
+          transform: scale(1, 1);
+  -webkit-transition: -webkit-transform cubic-bezier(0.100, 0.440, 0.430, 0.970) 250ms;
+  -o-transition: transform cubic-bezier(0.100, 0.440, 0.430, 0.970) 250ms;
+  transition: transform cubic-bezier(0.100, 0.440, 0.430, 0.970) 250ms;
 }
 
 .fs-go:hover {
-  transform: scale(1.1, 1.1);
+  -webkit-transform: scale(1.1, 1.1);
+      -ms-transform: scale(1.1, 1.1);
+          transform: scale(1.1, 1.1);
 }
 
 .fs-go::after {
@@ -200,7 +263,9 @@
   top: 100%;
   background-color: rgba(0,0,0,0.15);
   position: absolute;
-  transition: bottom ease-out 150ms;
+  -webkit-transition: bottom cubic-bezier(0.100, 0.440, 0.430, 0.970) 250ms;
+  -o-transition: bottom cubic-bezier(0.100, 0.440, 0.430, 0.970) 250ms;
+  transition: bottom cubic-bezier(0.100, 0.440, 0.430, 0.970) 250ms;
 }
 
 .fs-go:hover::after {
@@ -220,23 +285,32 @@
   width: 200px;
   height: 2px;
   pointer-events: none;
-  user-select: none;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
   position: absolute;
   left: 0;
-  transform: translateX(50vw);
+  -webkit-transform: translateX(50vw);
+      -ms-transform: translateX(50vw);
+          transform: translateX(50vw);
   z-index: 0;
 
-  visibility: hidden;
-  
-  background: -moz-linear-gradient(left, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%); /* FF3.6-15 */
+  visibility: hidden; /* FF3.6-15 */
   background: -webkit-linear-gradient(left, rgba(255,255,255,1) 0%,rgba(255,255,255,0) 100%); /* Chrome10-25,Safari5.1-6 */
+  background: -webkit-gradient(linear, left top, right top, from(rgba(255,255,255,1)),to(rgba(255,255,255,0)));
+  background: -o-linear-gradient(left, rgba(255,255,255,1) 0%,rgba(255,255,255,0) 100%);
   background: linear-gradient(to right, rgba(255,255,255,1) 0%,rgba(255,255,255,0) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#00ffffff',GradientType=1 ); /* IE6-9 */
 
-  animation-name: spark;
-  animation-duration: 1s;
-  animation-iteration-count: infinite;
-  animation-timing-function: linear;
+  -webkit-animation-name: spark;
+          animation-name: spark;
+  -webkit-animation-duration: 1s;
+          animation-duration: 1s;
+  -webkit-animation-iteration-count: infinite;
+          animation-iteration-count: infinite;
+  -webkit-animation-timing-function: linear;
+          animation-timing-function: linear;
 }
 
 .fs-go-spark::before {
@@ -248,24 +322,32 @@
   position: absolute;
   left: 0;
   top: 1px;
-  transform: translateY(-50%) rotate(45deg);
+  -webkit-transform: translateY(-50%) rotate(45deg);
+      -ms-transform: translateY(-50%) rotate(45deg);
+          transform: translateY(-50%) rotate(45deg);
+  display: none;
 }
 
 .fs-go:hover .fs-go-spark {
   visibility: visible;
 }
 
-.fs-go .fs-go-spark:nth-of-type(1) { animation-delay: 0.3s; }
-.fs-go .fs-go-spark:nth-of-type(2) { animation-delay: 0.1s; }
-.fs-go .fs-go-spark:nth-of-type(3) { animation-delay: 0.8s; }
-.fs-go .fs-go-spark:nth-of-type(4) { animation-delay: 0.5s; }
-.fs-go .fs-go-spark:nth-of-type(5) { animation-delay: 0.9s; }
+.fs-go .fs-go-spark:nth-of-type(1) { -webkit-animation-delay: 0.3s; animation-delay: 0.3s; }
+.fs-go .fs-go-spark:nth-of-type(2) { -webkit-animation-delay: 0.1s; animation-delay: 0.1s; }
+.fs-go .fs-go-spark:nth-of-type(3) { -webkit-animation-delay: 0.8s; animation-delay: 0.8s; }
+.fs-go .fs-go-spark:nth-of-type(4) { -webkit-animation-delay: 0.5s; animation-delay: 0.5s; }
+.fs-go .fs-go-spark:nth-of-type(5) { -webkit-animation-delay: 0.9s; animation-delay: 0.9s; }
 
 .fs-go span {
   z-index: 1;
 }
 
+@-webkit-keyframes spark {
+  from { -webkit-transform: translateX(50vw); transform: translateX(50vw); }
+  to { -webkit-transform: translateX(-webkit-calc(-50vw - 100%)); transform: translateX(calc(-50vw - 100%)); }
+}
+
 @keyframes spark {
-  from { transform: translateX(50vw); }
-  to { transform: translateX(calc(-50vw - 100%)); }
+  from { -webkit-transform: translateX(50vw); transform: translateX(50vw); }
+  to { -webkit-transform: translateX(-webkit-calc(-50vw - 100%)); transform: translateX(calc(-50vw - 100%)); }
 }
