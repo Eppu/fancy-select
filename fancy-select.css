@@ -13,14 +13,14 @@
 
 * {
   font-family: 'Montserrat', sans-serif;
-  /* -webkit-transition: all 500ms cubic-bezier(0.100, 0.440, 0.430, 0.970); 
-  -moz-transition: all 500ms cubic-bezier(0.100, 0.440, 0.430, 0.970); 
-  -o-transition: all 500ms cubic-bezier(0.100, 0.440, 0.430, 0.970); 
-  transition: all 500ms cubic-bezier(0.100, 0.440, 0.430, 0.970); */
+  /* -webkit-transition: all 500ms cubic-bezier(0.535, 00050, 50480, 50050); 
+  -moz-transition: all 500ms cubic-bezier(0.535, 00050, 50480, 50050); 
+  -o-transition: all 500ms cubic-bezier(0.535, 00050, 50480, 50050); 
+  transition: all 500ms cubic-bezier(0.535, 00050, 50480, 50050); */
 
-  -webkit-transition-timing-function: cubic-bezier(0.100, 0.440, 0.430, 0.970); 
-  -o-transition-timing-function: cubic-bezier(0.100, 0.440, 0.430, 0.970); 
-  transition-timing-function: cubic-bezier(0.100, 0.440, 0.430, 0.970); /* custom */
+  -webkit-transition-timing-function: cubic-bezier(0.535, 00050, 50480, 50050); 
+  -o-transition-timing-function: cubic-bezier(0.535, 00050, 50480, 50050); 
+  transition-timing-function: cubic-bezier(0.535, 00050, 50480, 50050); /* custom */
 
   -webkit-transition-duration: 250ms;
   -moz-transtion-duration: 250ms;
@@ -65,9 +65,9 @@
   -ms-transform: scale(1, 1);
   transform: scale(1, 1);
 
-  -webkit-transition: -webkit-transform cubic-bezier(0.100, 0.440, 0.430, 0.970) 250ms;
-  -o-transition: -o-transform cubic-bezier(0.100, 0.440, 0.430, 0.970) 250ms;
-  transition: -webkit-transform cubic-bezier(0.100, 0.440, 0.430, 0.970) 250ms;
+  -webkit-transition: -webkit-transform cubic-bezier(0.500, 0.500, 0.500, 0.950) 250ms;
+  -o-transition: -o-transform cubic-bezier(0.500, 0.500, 0.500, 0.950) 250ms;
+  transition: -webkit-transform cubic-bezier(0.500, 0.500, 0.500, 0.950) 250ms;
 }
 
 .fs-select.fs-active::before {
@@ -94,14 +94,14 @@
           transform: translateX(0);
 
   -webkit-transition:
-    -webkit-transform cubic-bezier(0.100, 0.440, 0.430, 0.970) 370ms,
-    text-indent cubic-bezier(0.100, 0.440, 0.430, 0.970) 370ms;
+    -webkit-transform cubic-bezier(0.500, 0.500, 0.500, 0.950) 370ms,
+    text-indent cubic-bezier(0.500, 0.500, 0.500, 0.950) 370ms;
   -o-transition:
-    transform cubic-bezier(0.100, 0.440, 0.430, 0.970) 370ms,
-    text-indent cubic-bezier(0.100, 0.440, 0.430, 0.970) 370ms;
+    transform cubic-bezier(0.500, 0.500, 0.500, 0.950) 370ms,
+    text-indent cubic-bezier(0.500, 0.500, 0.500, 0.950) 370ms;
   transition:
-    transform cubic-bezier(0.100, 0.440, 0.430, 0.970) 370ms,
-    text-indent cubic-bezier(0.100, 0.440, 0.430, 0.970) 370ms;
+    transform cubic-bezier(0.500, 0.500, 0.500, 0.950) 370ms,
+    text-indent cubic-bezier(0.500, 0.500, 0.500, 0.950) 370ms;
 }
 
 .fs-placeholder::after {
@@ -154,15 +154,15 @@
   opacity: 0;
   visibility: hidden;
   -webkit-transition:
-    opacity cubic-bezier(0.100, 0.440, 0.430, 0.970) 250ms,
-    -webkit-transform cubic-bezier(0.100, 0.440, 0.430, 0.970) 250ms;
+    opacity cubic-bezier(0.500, 0.500, 0.500, 0.950) 250ms,
+    -webkit-transform cubic-bezier(0.500, 0.500, 0.500, 0.950) 250ms;
   -o-transition:
-    transform cubic-bezier(0.100, 0.440, 0.430, 0.970) 250ms,
-    opacity cubic-bezier(0.100, 0.440, 0.430, 0.970) 250ms
+    transform cubic-bezier(0.500, 0.500, 0.500, 0.950) 250ms,
+    opacity cubic-bezier(0.500, 0.500, 0.500, 0.950) 250ms
   ;
   transition:
-    transform cubic-bezier(0.100, 0.440, 0.430, 0.970) 250ms,
-    opacity cubic-bezier(0.100, 0.440, 0.430, 0.970) 250ms
+    transform cubic-bezier(0.500, 0.500, 0.500, 0.950) 250ms,
+    opacity cubic-bezier(0.500, 0.500, 0.500, 0.950) 250ms
   ;
   white-space: nowrap;
   -o-text-overflow: ellipsis;
@@ -180,15 +180,15 @@
       -ms-transform: translateX(0);
           transform: translateX(0);
   -webkit-transition:
-    opacity cubic-bezier(0.100, 0.440, 0.430, 0.970) 250ms,
-    -webkit-transform cubic-bezier(0.100, 0.440, 0.430, 0.970) 250ms;
+    opacity cubic-bezier(0.500, 0.500, 0.500, 0.950) 250ms,
+    -webkit-transform cubic-bezier(0.500, 0.500, 0.500, 0.950) 250ms;
   -o-transition:
-    transform cubic-bezier(0.100, 0.440, 0.430, 0.970) 250ms,
-    opacity cubic-bezier(0.100, 0.440, 0.430, 0.970) 250ms
+    transform cubic-bezier(0.500, 0.500, 0.500, 0.950) 250ms,
+    opacity cubic-bezier(0.500, 0.500, 0.500, 0.950) 250ms
   ;
   transition:
-    transform cubic-bezier(0.100, 0.440, 0.430, 0.970) 250ms,
-    opacity cubic-bezier(0.100, 0.440, 0.430, 0.970) 250ms
+    transform cubic-bezier(0.500, 0.500, 0.500, 0.950) 250ms,
+    opacity cubic-bezier(0.500, 0.500, 0.500, 0.950) 250ms
   ;
 }
 
@@ -241,9 +241,9 @@
       -ms-transform: scale(1, 1);
 
           transform: scale(1, 1);
-  -webkit-transition: -webkit-transform cubic-bezier(0.100, 0.440, 0.430, 0.970) 250ms;
-  -o-transition: transform cubic-bezier(0.100, 0.440, 0.430, 0.970) 250ms;
-  transition: transform cubic-bezier(0.100, 0.440, 0.430, 0.970) 250ms;
+  -webkit-transition: -webkit-transform cubic-bezier(0.500, 0.500, 0.500, 0.950) 250ms;
+  -o-transition: transform cubic-bezier(0.500, 0.500, 0.500, 0.950) 250ms;
+  transition: transform cubic-bezier(0.500, 0.500, 0.500, 0.950) 250ms;
 }
 
 .fs-go:hover {
@@ -260,9 +260,9 @@
   top: 100%;
   background-color: rgba(0,0,0,0.15);
   position: absolute;
-  -webkit-transition: bottom cubic-bezier(0.100, 0.440, 0.430, 0.970) 250ms;
-  -o-transition: bottom cubic-bezier(0.100, 0.440, 0.430, 0.970) 250ms;
-  transition: bottom cubic-bezier(0.100, 0.440, 0.430, 0.970) 250ms;
+  -webkit-transition: bottom cubic-bezier(0.500, 0.500, 0.500, 0.950) 250ms;
+  -o-transition: bottom cubic-bezier(0.500, 0.500, 0.500, 0.950) 250ms;
+  transition: bottom cubic-bezier(0.500, 0.500, 0.500, 0.950) 250ms;
 }
 
 .fs-go:hover::after {
