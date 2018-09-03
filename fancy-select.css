@@ -85,25 +85,23 @@
   position: relative;
   display: block;
   padding: 1em;
-  opacity: 1;
-  -webkit-transform: translateX(0);
-      -ms-transform: translateX(0);
-          transform: translateX(0);
-  -webkit-transition:
-    text-indent cubic-bezier(0.100, 0.440, 0.430, 0.970) 250ms,
-    -webkit-transform cubic-bezier(0.100, 0.440, 0.430, 0.970) 250ms;
-  -o-transition:
-    transform cubic-bezier(0.100, 0.440, 0.430, 0.970) 250ms,
-    text-indent cubic-bezier(0.100, 0.440, 0.430, 0.970) 250ms
-  ;
-  transition:
-    transform cubic-bezier(0.100, 0.440, 0.430, 0.970) 250ms,
-    text-indent cubic-bezier(0.100, 0.440, 0.430, 0.970) 250ms
-  ;
   white-space: nowrap;
   -o-text-overflow: ellipsis;
      text-overflow: ellipsis;
   overflow: hidden;
+  -webkit-transform: translateX(0);
+      -ms-transform: translateX(0);
+          transform: translateX(0);
+
+  -webkit-transition:
+    -webkit-transform cubic-bezier(0.100, 0.440, 0.430, 0.970) 370ms,
+    text-indent cubic-bezier(0.100, 0.440, 0.430, 0.970) 370ms;
+  -o-transition:
+    transform cubic-bezier(0.100, 0.440, 0.430, 0.970) 370ms,
+    text-indent cubic-bezier(0.100, 0.440, 0.430, 0.970) 370ms;
+  transition:
+    transform cubic-bezier(0.100, 0.440, 0.430, 0.970) 370ms,
+    text-indent cubic-bezier(0.100, 0.440, 0.430, 0.970) 370ms;
 }
 
 .fs-placeholder::after {
@@ -119,8 +117,7 @@
 }
 
 .fs-select.fs-active .fs-placeholder {
-  opacity: 0;
-  text-indent: -200px;
+  text-indent: -135%;
 }
 
 .fs-options {
