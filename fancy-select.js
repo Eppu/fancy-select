@@ -27,7 +27,198 @@ var getClosest = function (elem, selector) {
 };
 
 
-window.docReady(function() {
+/**
+ * Add attributes to DOM elements.
+ * @param {HTMLElement} element Element to which add the attribute
+ * @param {string} name Attribute name
+ * @param {string} value Attribute value
+ */
+const setAtt = (element, name, value) => {
+  const att = document.createAttribute(name);
+  att.value = value;
+  element.setAttributeNode(att);
+}
+
+
+/**
+ * Parse native <select> elements into JavaScript objects
+ * Use __another_function__ to transform these objects into Fancy Selects
+ */
+const parseSelects = () => {
+  // Get native <select> elements
+  const nativeSelects = document.getElementsByClassName('fs-select-origin');
+  const fancySelects = [];
+  for (let i = 0; i < nativeSelects.length; i += 1) {
+    const s = nativeSelects[i];
+    /**
+     * Deconstruct elements and their options into the following format
+     * {
+     *   name: ...,
+     *   options: [
+     *     ...,
+     *   ],
+     *   texts: [
+     *     ...,
+     *   ],
+     *   selectedIndex: ...,
+     * }
+     */
+    const item = {};
+
+    // Parse element name
+    try {
+      item.name = s.attributes['name'].value;
+    } catch (e) {
+      console.log('Couldn\'t find name in the following element ', s);
+      continue;
+    }
+
+    // Parse element option values and names
+    try {
+      const options = s.getElementsByTagName('option');
+      item.options = [];
+      item.texts = [];
+      for (let j = 0; j < options.length; j += 1) {
+        const o = options[j];
+        // Copy option value and text into the object we're building
+        item.options[j] = o.value;
+        item.texts[j] = o.text;
+
+        // Check if item is selected
+        if (o.selected) { item.selectedIndex = j }
+      }
+    } catch (e) {
+      console.log('Couldn\'t parse options from the following element ', s);
+      continue;
+    }
+
+    // Element is not expanded by default
+    item.isOpen = false;
+
+    // Successfully built an object. Add it to an array of finished objects.
+    fancySelects.push(item);
+  }
+  
+  return {
+    total: nativeSelects.length,
+    success: fancySelects.length,
+    items: fancySelects,
+  };
+}
+
+
+/**
+ * Create Fancy Select elements from a list of parsed <select> elements
+ */
+const createFancySelects = (items) => {
+  for(let i = 0; i < items.length; i += 1) {
+    console.log(items[i]);
+
+    // CONTAINER
+    const container = document.createElement('div');
+    setAtt(container, 'class', 'fs-select'); // class
+    setAtt(container, 'data-name', items[i].name) // data-name
+    // Data-width
+    setAtt(container, 'data-width', '7.5');
+
+
+    // PLACEHOLDER
+    const ph = document.createElement('span');
+    setAtt(ph, 'class', 'fs-placeholder');
+    
+    // Set placeholder value to what is selected
+    const phText = items[i].texts[items[i].selectedIndex];
+    const phTextNode = document.createTextNode(phText);
+  
+    // Add text to placeholder
+    ph.appendChild(phTextNode);
+
+    // Add placeholder to container
+    container.appendChild(ph);
+
+
+    // OPTIONS LIST
+    const oWrapper = document.createElement('div'); // Wrapper
+    setAtt(oWrapper, 'class', 'fs-options');
+
+    const oList = document.createElement('ul'); // UL
+    setAtt(oList, 'class', 'fs-options-list');
+
+    // Create all different options
+    for(let j = 0; j < items[i].options.length; j += 1) {
+      const opt = document.createElement('li');
+      setAtt(opt, 'data-value', items[i].options[j]);
+      try {
+        // Add text to option.
+        optTextNode = document.createTextNode(items[i].texts[j]);
+        opt.appendChild(optTextNode);
+      } catch (e) {
+        console.log(`Select element named ${items[i].name} has unequal amounts of options and texts. Check that each option has a value attribute and text content.`);
+      }
+
+      // Add created <li> element to <ul> wrapper.
+      oList.appendChild(opt);
+    }
+
+    oWrapper.appendChild(oList); // Add <ul> to wrapper
+    container.appendChild(oWrapper); // Add options list wrapper to container
+
+    // Add created Fancy Selects into their correct positions
+    const sourceLocations = document.getElementsByName(items[i].name);
+    for (let j = 0; j < sourceLocations.length; j += 1) {
+      // Add Fancy Select
+      sourceLocations[j].parentElement.appendChild(container);
+      // Hide original <select>
+      sourceLocations[j].style.display = 'none';
+    }
+  }
+}
+
+
+/**
+ * Take a select elements and build a Fancy Selects from them
+ */
+const init = () => {
+  // Parse native <select> elements into JS objects
+  const { total, success, items } = parseSelects();
+
+  // Log how many were successfully parsed
+  console.log(`Found ${total} <select> elements and converted ${success} into objects.`);
+  console.log(items);
+
+  // Construct a Fancy Select element from each object
+  createFancySelects(items);
+}
+
+
+window.docReady(function() {  
+  // Initialize fancy-select
+  init();
+
+  // Initialize fancy-select element sizes
+  initializeSelectSizes();
+
+  // Update placeholder texts to select element values
+  updatePlaceholders();
+
+  // Add event listeners to <select> elements just in case the user manages to change them.
+  var selectElements = document.getElementsByClassName('fs-select-origin');
+  for (var i = 0; i < selectElements.length; i += 1) {
+    selectElements[i].onchange = updatePlaceholders;
+  }
+
+  // When a <li> element is clicked
+  // Find all .fs-options-list elements
+  var listElements = document.querySelectorAll('.fs-options-list li');
+  for (var i = 0; i < listElements.length; i += 1) {
+    // Add click and keydown handlers
+    listElements[i].onclick = handleSelect;
+    listElements[i].keydown = handleSelect;
+  }  
+
+
+
+
   // Toggle active class.
   function toggleActive() {
     this.classList.toggle('fs-active');
@@ -38,7 +229,7 @@ window.docReady(function() {
   // Toggle '.fs-select' active state when it is clicked.
   var fs_elements = document.getElementsByClassName(className);
   if (fs_elements && typeof fs_elements !== 'undefined') {
-    for (var i = 0; i < fs_elements.length; i++) {
+    for (var i = 0; i < fs_elements.length; i += 1) {
       // Add click and keydown event listeners.
       fs_elements[i].onclick = toggleActive;
       fs_elements[i].keydown = toggleActive;
@@ -62,7 +253,7 @@ window.docReady(function() {
 
     // Update all select elements with matching names to the new value
     var selects = document.getElementsByName(name);
-    for (var i = 0; i < selects.length; i++) {
+    for (var i = 0; i < selects.length; i += 1) {
       selects[i].querySelector('option[value="' + value + '"]').selected = true;
     }
   }
@@ -74,7 +265,7 @@ window.docReady(function() {
     // Get a list of all placeholder elements
     var placeholders = document.getElementsByClassName('fs-placeholder');
 
-    for (var i = 0; i < placeholders.length; i++) {
+    for (var i = 0; i < placeholders.length; i += 1) {
       // Get the .fs-select parent element
       var parent = getClosest(placeholders[i], '.fs-select');
 
@@ -90,7 +281,7 @@ window.docReady(function() {
 
       // Update styling on the <li> element if it matches the current value
       var listElements = parent.querySelectorAll('.fs-options .fs-options-list li');
-      for (var j = 0; j < listElements.length; j++) {
+      for (var j = 0; j < listElements.length; j += 1) {
         if (listElements[j].textContent === selectValue) {
           listElements[j].style.color = '#777777';
         } else {
@@ -109,7 +300,7 @@ window.docReady(function() {
     /* WIDTH */
     // Set fancy-select element widths from their data-width properties
     var fancySelects = document.getElementsByClassName('fs-select');
-    for (var i = 0; i < fancySelects.length; i++) {
+    for (var i = 0; i < fancySelects.length; i += 1) {
       // Read target width from data-width attribute
       var targetWidth = fancySelects[i].attributes['data-width'].value;
 
@@ -123,7 +314,7 @@ window.docReady(function() {
     var styleElem = document.head.appendChild(document.createElement('style'));
 
     // Then loop through all the fancy-selects
-    for (var i = 0; i < fancySelects.length; i++) {
+    for (var i = 0; i < fancySelects.length; i += 1) {
       var current = fancySelects[i];
       // Count number of list elements it has as children
       var count = current.querySelectorAll('.fs-options .fs-options-list li').length;
@@ -145,26 +336,4 @@ window.docReady(function() {
       styleElem.innerHTML = styleElem.innerHTML + selector + style;
     }
   }
-
-
-  // Initialize fancy-select element sizes
-  initializeSelectSizes();
-
-  // Update placeholder texts to select element values
-  updatePlaceholders();
-
-  // Add event listeners to <select> elements just in case the user manages to change them.
-  var selectElements = document.getElementsByClassName('fs-select-origin');
-  for (var i = 0; i < selectElements.length; i++) {
-    selectElements[i].onchange = updatePlaceholders;
-  }
-
-  // When a <li> element is clicked
-  // Find all .fs-options-list elements
-  var listElements = document.querySelectorAll('.fs-options-list li');
-  for (var i = 0; i < listElements.length; i++) {
-    // Add click and keydown handlers
-    listElements[i].onclick = handleSelect;
-    listElements[i].keydown = handleSelect;
-  }  
 });
