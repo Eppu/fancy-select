@@ -40,6 +40,9 @@ const setAtt = (element, name, value) => {
 }
 
 
+const fancySelects = []; // Contains all Fancy Select objects
+
+
 /**
  * Parse native <select> elements into JavaScript objects
  * Use __another_function__ to transform these objects into Fancy Selects
@@ -47,7 +50,6 @@ const setAtt = (element, name, value) => {
 const parseSelects = () => {
   // Get native <select> elements
   const nativeSelects = document.getElementsByClassName('fs-select-origin');
-  const fancySelects = [];
   for (let i = 0; i < nativeSelects.length; i += 1) {
     const s = nativeSelects[i];
     /**
@@ -169,8 +171,23 @@ const createFancySelects = (items) => {
       // Add Fancy Select
       sourceLocations[j].parentElement.appendChild(container);
       // Hide original <select>
-      sourceLocations[j].style.display = 'none';
+      // sourceLocations[j].style.display = 'none';
     }
+  }
+}
+
+
+/**
+ * Update specified (or all) Fancy Select elements with values from fancySelects[].
+ * @param {Array} names Element names that are to be updated. If empty, will update all.
+ */
+const updateFancySelects = (names) => {
+  const elems = [];
+  if (names instanceof Array) {
+    console.log('[updateFancySelects] Parameter is an array', names);
+    // Find all Fancy Select elements
+  } else {
+    console.log('[updateFancySelects] Parameter is not an array. Updating all!', names);
   }
 }
 
@@ -240,23 +257,77 @@ window.docReady(function() {
 
 
   function handleSelect() {
-    updateSelect(this);
-    updatePlaceholders();
+    // Update underlying data objects
+    const updatedNames = updateData(this);
+    console.log('ran updateSelect', updatedNames, fancySelects);
+
+    // Update visible objects based on data that was changed
+    updateElements(updatedNames);
+
+
+    // updatePlaceholders();
   }
 
-  // Update select element value
-  function updateSelect(elem) {
+
+  /**
+   * Update underlying JavaScript select objects to reflect the element that was clicked.
+   * @param {HTMLElement} elem Element that was clicked
+   * @returns {Array} Names of the objects that were updated
+   */
+  function updateData(elem) {
     // Get select element's name from parent
     var name = getClosest(elem, '.fs-select').attributes['data-name'].value;
     // Get selected item value
     var value = elem.attributes['data-value'].value;
 
+    const updatedNames = [];
+    // Update underlying object with new selected index.
+    for (let entry of fancySelects) {
+      // First find the right object(s)
+      if (entry.name === name) {
+        // Find index of newly selected value
+        const oldIndex = entry.selectedIndex;
+        const newIndex = entry.options.indexOf(value);
+        if (newIndex !== -1 && !(oldIndex === newIndex)) {
+          entry.selectedIndex = newIndex;
+          console.log(`Successfully updated selectedIndex from ${oldIndex} to ${newIndex}`);
+          updatedNames.push(name);
+        } else {
+          console.log(`Didn't update ${oldIndex} to ${newIndex}`);
+        }
+      }
+    }
+
+    return updatedNames;
+
     // Update all select elements with matching names to the new value
+    /*
     var selects = document.getElementsByName(name);
     for (var i = 0; i < selects.length; i += 1) {
       selects[i].querySelector('option[value="' + value + '"]').selected = true;
     }
+    */
   }
+
+
+  /**
+   * Update <select> elements AND Fancy Select placeholders.
+   * @param {Array} names Element name attributes that were updated.
+   */
+  const updateElements = (names) => {
+    console.log('Updating elements...', names);
+    // Update native <select> elements.
+    let nativeCollection = document.getElementsByTagName('select'); // Returns a HTMLCollection
+    const natives = []; // Make a regular boring array out of the collection
+    for (let i = 0; i < natives.length; i +=1) {
+      natives.push(nativeCollection[i]);
+    }
+    
+    console.log(natives);
+    natives = natives.filter(item => names.indexOf(item.name) > -1); // Only handle elements that have changed
+    console.log(natives);
+  }
+
 
   /**
    * Update placeholder texts to reflect their respective <select> elements.
@@ -290,6 +361,7 @@ window.docReady(function() {
       }
     }
   }
+
 
   /**
    * Initialize all fancy-select element sizes.
