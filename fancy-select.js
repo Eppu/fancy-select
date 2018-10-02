@@ -1,3 +1,110 @@
+/**
+ * FancySelect data structure with methods for getting and setting data
+ * @param {string} name Element name
+ * @param {array} options Option values (no spaces)
+ * @param {array} texts Option texts displayed to the user
+ * @param {number} selectedIndex Index of the currently selected item
+ * @param {boolean} openState Is this element expanded or not
+ */
+function FancySelect(name, options, texts, selectedIndex, openState) {
+  // Getter methods
+  this.getName = () => name;
+  this.getOptions = () => options;
+  this.getTexts = () => texts;
+  this.getSelectedIndex = () => selectedIndex;
+  this.getOpenState = () => openState;
+
+  /**
+   * Open this element and update visible elements accordingly.
+   */
+  this.open = () => {
+    openState = true;
+
+    // Open Fancy Select with this name
+    const elements = document.querySelectorAll(`.fs-select[data-name="${name}"]`);
+    for (let i = 0; i < elements.length; i += 1) {
+      elements[i].classList.add('fs-active');
+    }
+
+    // Close other Fancy Selects
+    for (let i = 0; i < fancySelects.length; i += 1) {
+      const item = fancySelects[i];
+      if (item.getName() !== name && item.getOpenState()) {
+        // If a differently named item is open, close 
+        item.close();
+      }
+    }
+  }
+
+  /**
+   * Close this element and update visible elements accordingly.
+   */
+  this.close = () => {
+    openState = false;
+
+    const elements = document.querySelectorAll(`.fs-select[data-name="${name}"]`);
+    for (let i = 0; i < elements.length; i += 1) {
+      elements[i].classList.remove('fs-active');
+    }
+  }
+
+  /**
+   * Select an index and update visible elements accordingly.
+   * @param {number} newIndex Index to select
+   */
+  this.select = (newIndex) => {
+    // Check that newIndex is a positive integer.
+    if (typeof newIndex !== 'number') throw new TypeError('Index must be a number.');
+    if (newIndex < 0 || newIndex % 1 !== 0) throw new RangeError('Index must be a positive integer.');
+    if (newIndex > options.length - 1) throw new RangeError(`Element does not have an option at index ${newIndex}. Maximum index is ${options.length - 1}.`);
+
+    selectedIndex = newIndex;
+    return selectedIndex;
+  }
+}
+
+
+/**
+ * Handle clicks on Fancy Selects (and other elements)
+ * @param {*} event 
+ */
+function handleClick(event) {
+  event.stopPropagation();
+  if (this.hasOwnProperty('isGeneric') && this.isGeneric) {
+    // User clicked somewhere else than a Fancy Select. Close all Fancy Selects!
+    for (let i = 0; i < fancySelects.length; i += 1) {
+      const item = fancySelects[i];
+      if (item.getOpenState()) {
+        item.close();
+      }
+    }
+  } else {
+    // User clicked a Fancy Select
+    const name = this.attributes['data-name'].value;
+    for (let i = 0; i < fancySelects.length; i += 1) {
+      // Go through all stored FancySelect objects
+      const item = fancySelects[i];
+      if (item.getName() === name) {
+        // Open the correct one
+        item.open();
+      }
+      // Don't close the other, incorrect, Fancy Selects here. The open() function already does that.
+    }
+  }
+}
+
+
+
+
+
+
+
+
+
+const test = new FancySelect('testi', ['lol', 'herp', 'derp'], ['lol', 'herp', 'derp'], 2, false);
+console.log(test.getTexts());
+
+
 // Get closest parent element by selector
 // https://gomakethings.com/how-to-get-the-closest-parent-element-with-a-matching-selector-using-vanilla-javascript/
 const getClosest = (elem, selector) => {
@@ -23,7 +130,6 @@ const getClosest = (elem, selector) => {
     if (elem.matches(selector)) return elem;
   }
   return null;
-
 };
 
 
@@ -98,7 +204,8 @@ const parseSelects = () => {
     item.isOpen = false;
 
     // Successfully built an object. Add it to an array of finished objects.
-    fancySelects.push(item);
+    fancySelects.push(new FancySelect(item.name, item.options, item.texts, item.selectedIndex, item.isOpen));
+    console.log(fancySelects);
   }
   
   return {
@@ -119,7 +226,7 @@ const createFancySelects = (items) => {
     // CONTAINER
     const container = document.createElement('div');
     setAtt(container, 'class', 'fs-select'); // class
-    setAtt(container, 'data-name', items[i].name) // data-name
+    setAtt(container, 'data-name', items[i].getName()) // data-name
     // Data-width
     setAtt(container, 'data-width', '7.5');
 
@@ -129,7 +236,7 @@ const createFancySelects = (items) => {
     setAtt(ph, 'class', 'fs-placeholder');
     
     // Set placeholder value to what is selected
-    const phText = items[i].texts[items[i].selectedIndex];
+    const phText = items[i].getTexts()[items[i].selectedIndex];
     const phTextNode = document.createTextNode(phText);
   
     // Add text to placeholder
@@ -147,15 +254,15 @@ const createFancySelects = (items) => {
     setAtt(oList, 'class', 'fs-options-list');
 
     // Create all different options
-    for(let j = 0; j < items[i].options.length; j += 1) {
+    for(let j = 0; j < items[i].getOptions().length; j += 1) {
       const opt = document.createElement('li');
-      setAtt(opt, 'data-value', items[i].options[j]);
+      setAtt(opt, 'data-value', items[i].getOptions()[j]);
       try {
         // Add text to option.
-        optTextNode = document.createTextNode(items[i].texts[j]);
+        optTextNode = document.createTextNode(items[i].getTexts()[j]);
         opt.appendChild(optTextNode);
       } catch (e) {
-        console.log(`Select element named ${items[i].name} has unequal amounts of options and texts. Check that each option has a value attribute and text content.`);
+        console.log(`Select element named ${items[i].getName()} has unequal amounts of options and texts. Check that each option has a value attribute and text content.`);
       }
 
       // Add created <li> element to <ul> wrapper.
@@ -166,7 +273,7 @@ const createFancySelects = (items) => {
     container.appendChild(oWrapper); // Add options list wrapper to container
 
     // Add created Fancy Selects into their correct positions
-    const sourceLocations = document.getElementsByName(items[i].name);
+    const sourceLocations = document.getElementsByName(items[i].getName());
     for (let j = 0; j < sourceLocations.length; j += 1) {
       // Add Fancy Select
       sourceLocations[j].parentElement.appendChild(container);
@@ -429,8 +536,11 @@ window.docReady(function() {
   if (fs_elements && typeof fs_elements !== 'undefined') {
     for (var i = 0; i < fs_elements.length; i += 1) {
       // Add click and keydown event listeners.
-      fs_elements[i].onclick = toggleActive.bind(fs_elements[i]);
-      fs_elements[i].keydown = toggleActive.bind(fs_elements[i]);
+      // fs_elements[i].onclick = toggleActive.bind(fs_elements[i]);
+      // fs_elements[i].keydown = toggleActive.bind(fs_elements[i]);
+
+      fs_elements[i].onclick = handleClick.bind(fs_elements[i]);
+      fs_elements[i].keydown = handleClick.bind(fs_elements[i]);
     }
   } else {
     console.log('Could not find any elements with class name ' + className);
@@ -438,4 +548,4 @@ window.docReady(function() {
 });
 
 
-document.body.addEventListener('click', toggleActive.bind({ isGeneric: true }));
+document.body.addEventListener('click', handleClick.bind({ isGeneric: true }));
