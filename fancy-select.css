@@ -217,7 +217,7 @@
 
 /* Hover colors for list elements */
 .fs-options-list li:hover { color: #DADADA; }
-.fs-select-container.light .fs-options-list li:hover { color: #666666; }
+.fs-select-container.light .fs-options-list li:hover { color: #AAAAAA; }
 
 .fs-go-container {
   display: block;
