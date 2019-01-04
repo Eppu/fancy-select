@@ -14,6 +14,14 @@ function FancySelect(name, options, texts, selectedIndex, openState) {
   this.getSelectedIndex = () => selectedIndex;
   this.getOpenState = () => openState;
 
+  this.getText = (index) => {
+    try {
+      return texts[index];
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
   /**
    * Open this element and update visible elements accordingly.
    */
@@ -311,26 +319,9 @@ function handleSelect(event, parent, element) {
   // Update Fancy Select placeholders
   if (debugLevel > 1)
     console.log('Updating placeholder text for', element);
-  updatePlaceholders([element]);
+  updatePlaceholder(parent, element);
 
   return;
-
-  // Update visible objects based on data that was changed
-  if (updatedItem != undefined && updatedItem.length > 0) {
-    updateSelectElements(updatedItem);
-  } else {
-    for (let i = 0; i < fancySelects.length; i += 1) {
-      console.log('Closing FancySelect', fancySelects[i].getName());
-      
-      const item = fancySelects[i];
-      if (item.getOpenState()) {
-        item.close();
-      }
-    }
-  }
-
-  // Refactor updateSelectElements to update the placeholders or something
-  updatePlaceholders();
 }
 
 
@@ -363,42 +354,29 @@ const updateSelectElements = (items) => {
 
 
 /**
- * TODO: Refactor this so that all displayed values come from Fancy Select objects, not hidden <select> elements.
- * Update Fancy Select placeholder texts to reflect the currently selected option in their respective <select> elements.
- * @param {Array} items Array of Fancy Select DOM elements.
+ * Update Fancy Select placeholder text with what the data object has selected.
+ * @param {Object} obj Fancy Select object with new values.
+ * @param {Object} element Fancy Select DOM element that needs to be updated.
  */
-const updatePlaceholders = (items) => {
-  let count = 0;
-  for (var i = 0; i < items.length; i += 1) {
-    const current = items[i];
-    const placeholder = current.querySelector('.fs-placeholder');
+const updatePlaceholder = (obj, element) => {
+  const placeholder = element.querySelector('.fs-placeholder');
+  const newValue = obj.getText(obj.getSelectedIndex());
 
-    // Get data-name attribute value from .fs-select element
-    var dataName = current.attributes['data-name'].value;
-
-    // Use data-name to find the correct <select> element and its currently selected option's text
-    var selectElement = document.getElementsByName(dataName)[0];
-    var selectValue = selectElement.options[selectElement.selectedIndex].innerText;
-
-    // Update placeholder with newly found text
-    if (placeholder.innerHTML !== selectValue) {
-      placeholder.innerHTML = selectValue;
-      count =+ 1;
-    }
-
-    // Update styling on the <li> element if it matches the current value
-    var listElements = current.querySelectorAll('.fs-options .fs-options-list li');
-    for (var j = 0; j < listElements.length; j += 1) {
-      if (listElements[j].textContent === selectValue) {
-        listElements[j].style.color = '#777777';
-      } else {
-        listElements[j].removeAttribute('style');
-      }
-    }
+  // Update placeholder with newly found text
+  if (placeholder.innerHTML !== newValue) {
+    placeholder.innerHTML = newValue;
+    count =+ 1;
   }
 
-  if (debugLevel > 0)
-    console.log(`Updated Fancy Select placeholder texts for ${count} elements.`)
+  // Update styling on the <li> element if it matches the current value
+  var listElements = element.querySelectorAll('.fs-options .fs-options-list li');
+  for (var j = 0; j < listElements.length; j += 1) {
+    if (listElements[j].textContent === newValue) {
+      listElements[j].style.color = '#777777';
+    } else {
+      listElements[j].removeAttribute('style');
+    }
+  }
 }
 
 
@@ -486,12 +464,14 @@ window.docReady(function() {
   initializeSelectSizes(fsElements);
 
   // Update placeholder texts to select element values
-  updatePlaceholders(fsElements);
+  for (let i = 0; i < fsObjects.length; i += 1) {
+    updatePlaceholder(fsObjects[i], fsElements[i]);
+  }
 
   // Add event listeners to <select> elements just in case the user manages to change them.
   var selectElements = document.getElementsByClassName('fs-select-origin');
   for (var i = 0; i < selectElements.length; i += 1) {
-    selectElements[i].addEventListener('change', () => updatePlaceholders(fsElements));
+    selectElements[i].addEventListener('change', () => updatePlaceholder(fsObjects[i], fsElements[i]));
   }
 
   for (let i = 0; i < fsElements.length; i += 1) {
@@ -519,4 +499,9 @@ window.docReady(function() {
 
   // When the document body is clicked, close all Fancy Selects
   document.body.addEventListener('click', event => handleClick(event, null, fsObjects));
+
+  // Make the "GO" button do something
+  document.querySelector('.fs-go').addEventListener('click', event => {
+    console.log(fsObjects.map(item => item.getText(item.getSelectedIndex())));
+  });
 });
