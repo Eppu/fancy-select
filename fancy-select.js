@@ -53,7 +53,7 @@ function FancySelect(name, options, texts, selectedIndex, openState) {
    * @param {number} newIndex Index to select
    */
   this.select = (newIndex) => {
-    // Check that newIndex is a positive integer.
+    // Check that newIndex is a valid positive integer.
     if (typeof newIndex !== 'number') throw new TypeError('Index must be a number.');
     if (newIndex < 0 || newIndex % 1 !== 0) throw new RangeError('Index must be a positive integer.');
     if (newIndex > options.length - 1) throw new RangeError(`Element does not have an option at index ${newIndex}. Maximum index is ${options.length - 1}.`);
@@ -66,7 +66,7 @@ function FancySelect(name, options, texts, selectedIndex, openState) {
 
 /**
  * Handle clicks on Fancy Selects (and other elements)
- * @param {*} event 
+ * @param {*} event Click event
  */
 function handleClick(event) {
   event.stopPropagation();
@@ -92,17 +92,6 @@ function handleClick(event) {
     }
   }
 }
-
-
-
-
-
-
-
-
-
-const test = new FancySelect('testi', ['lol', 'herp', 'derp'], ['lol', 'herp', 'derp'], 2, false);
-console.log(test.getTexts());
 
 
 // Get closest parent element by selector
@@ -146,14 +135,23 @@ const setAtt = (element, name, value) => {
 }
 
 
-const fancySelects = []; // Contains all Fancy Select objects
+/*********************************************************************
+ * End utility functions
+ *********************************************************************/
+
+
+const debugLevel = 1;
 
 
 /**
- * Parse native <select> elements into JavaScript objects
- * Use __another_function__ to transform these objects into Fancy Selects
+ * Parse native <select> elements into JavaScript objects. 
+ * Use createFancySelects to transform these objects into Fancy Selects
+ * @returns {Object} Reference to an array of FancySelect objects.
  */
 const parseSelects = () => {
+  // This used to be a global variable. Fall back to using it as a global if things don't start working.
+  const fancySelects = []; // Contains all Fancy Select objects
+
   // Get native <select> elements
   const nativeSelects = document.getElementsByClassName('fs-select-origin');
   for (let i = 0; i < nativeSelects.length; i += 1) {
@@ -205,23 +203,27 @@ const parseSelects = () => {
 
     // Successfully built an object. Add it to an array of finished objects.
     fancySelects.push(new FancySelect(item.name, item.options, item.texts, item.selectedIndex, item.isOpen));
-    console.log(fancySelects);
   }
+
+  // Log how many were successfully parsed
+  if (debugLevel > 0) 
+    console.log(`Found ${nativeSelects.length} <select> elements and converted ${fancySelects.length} into objects.`);
   
-  return {
-    total: nativeSelects.length,
-    success: fancySelects.length,
-    items: fancySelects,
-  };
+  return fancySelects;
 }
 
 
 /**
- * Create Fancy Select elements from a list of parsed <select> elements
+ * Create DOM elements from FancySelect objects.
+ * @param {Array} items Array of FancySelect objects.
+ * @returns {*} Array of created DOM elements.
  */
 const createFancySelects = (items) => {
+  const DOMElements = [];
+
   for(let i = 0; i < items.length; i += 1) {
-    console.log(items[i]);
+    if (debugLevel > 1)
+      console.log('Creating fancy select', items[i]);
 
     // CONTAINER
     const container = document.createElement('div');
@@ -262,7 +264,7 @@ const createFancySelects = (items) => {
         optTextNode = document.createTextNode(items[i].getTexts()[j]);
         opt.appendChild(optTextNode);
       } catch (e) {
-        console.log(`Select element named ${items[i].getName()} has unequal amounts of options and texts. Check that each option has a value attribute and text content.`);
+        console.warn(`Select element named ${items[i].getName()} has unequal amounts of options and texts. Check that each option has a value attribute and text content.`);
       }
 
       // Add created <li> element to <ul> wrapper.
@@ -272,7 +274,7 @@ const createFancySelects = (items) => {
     oWrapper.appendChild(oList); // Add <ul> to wrapper
     container.appendChild(oWrapper); // Add options list wrapper to container
 
-    // Add created Fancy Selects into their correct positions
+    // Add created Fancy Selects into their correct positions and hide the native <select> element.
     const sourceLocations = document.getElementsByName(items[i].getName());
     for (let j = 0; j < sourceLocations.length; j += 1) {
       // Add Fancy Select
@@ -280,7 +282,11 @@ const createFancySelects = (items) => {
       // Hide original <select>
       sourceLocations[j].style.display = 'none';
     }
+
+    DOMElements.push(container);
   }
+
+  return DOMElements;
 }
 
 
@@ -337,13 +343,23 @@ const updateFancySelects = (names) => {
 
   function handleSelect() {
     // Update underlying data objects
-    const updatedNames = updateData(this);
-    console.log('ran updateSelect', updatedNames, fancySelects);
+    const updatedItems = updateData(this);
 
     // Update visible objects based on data that was changed
-    updateElements(updatedNames);
+    if (updatedItems != undefined && updatedItems.length > 0) {
+      updateElements(updatedItems);
+    } else {
+      for (let i = 0; i < fancySelects.length; i += 1) {
+        console.log('Closing FancySelect', fancySelects[i].getName());
+        
+        const item = fancySelects[i];
+        if (item.getOpenState()) {
+          item.close();
+        }
+      }
+    }
 
-
+    // Refactor updateElements to update the placeholders or something
     // updatePlaceholders();
   }
 
@@ -355,30 +371,34 @@ const updateFancySelects = (names) => {
    */
   const updateData = elem => {
     // Get select element's name from parent
-    console.log(elem);
+    console.log('Clicked target: ', elem);
     var name = getClosest(elem, '.fs-select').attributes['data-name'].value;
     // Get selected item value
     var value = elem.attributes['data-value'].value;
 
-    const updatedNames = [];
+    const updatedItems = [];
     // Update underlying object with new selected index.
+    console.log(fancySelects);
     for (let entry of fancySelects) {
       // First find the right object(s)
-      if (entry.name === name) {
+      if (entry.getName() === name) {
         // Find index of newly selected value
-        const oldIndex = entry.selectedIndex;
-        const newIndex = entry.options.indexOf(value);
+        const oldIndex = entry.getSelectedIndex();
+        const newIndex = entry.getOptions().indexOf(value);
         if (newIndex !== -1 && !(oldIndex === newIndex)) {
-          entry.selectedIndex = newIndex;
+          entry.select(newIndex);
           console.log(`Successfully updated selectedIndex from ${oldIndex} to ${newIndex}`);
-          updatedNames.push(name);
+          updatedItems.push({
+            name: name,
+            index: newIndex,
+          });
         } else {
           console.log(`Didn't update ${oldIndex} to ${newIndex}`);
         }
       }
     }
 
-    return updatedNames;
+    return updatedItems;
 
     // Update all select elements with matching names to the new value
     /*
@@ -392,44 +412,65 @@ const updateFancySelects = (names) => {
 
   /**
    * Update <select> elements AND Fancy Select placeholders.
-   * @param {Array} names Element name attributes that were updated.
+   * @param {Array} items Element names and selected indices that were updated.
    */
-  const updateElements = (names) => {
-    console.log('Updating elements...', names);
+  const updateElements = (items) => {
+    console.log('Updating elements...', items);
     // Update native <select> elements.
     let nativeCollection = document.getElementsByTagName('select'); // Returns a HTMLCollection
-    let natives = []; // Make a regular boring array out of the collection
-    for (let i = 0; i < natives.length; i +=1) {
-      natives.push(nativeCollection[i]);
+    let nativeSelects = [].slice.call(nativeCollection); // Make a regular boring array out of the collection
+
+    for (n of nativeCollection) {
+      for (i of items) {
+        // Only modify elements that have changed.
+        if (n.name === i.name) {
+          // Remove 'selected' attribute from old option
+          const oldSelectedOption = ( n.querySelector('option[selected]') || n.querySelector('option[selected="selected"]') );
+          oldSelectedOption.removeAttribute('selected');
+
+          // Set new option as selected
+          setAtt(n.getElementsByTagName('option')[i.index], 'selected', 'selected');
+        }
+      }
     }
-    
-    natives = natives.filter(item => names.indexOf(item.name) > -1); // Only handle elements that have changed
+
+    // NOTE: Running updatePlaceholders here creates unnecessary work since it does DOM scraping.
+    // This function (updateElements) knows which elements to update. Use that to our advantage here!
+    // updatePlaceholders();
+
+
+    // NOTE: Currently not implemented
+    // Update actual FancySelect elements
+    updateFancySelects(items.map(i => i.name));
   }
 
 
   /**
-   * Update placeholder texts to reflect their respective <select> elements.
+   * Update Fancy Select placeholder texts to reflect the currently selected option in their respective <select> elements.
+   * @param {Array} items Array of Fancy Select DOM elements.
    */
-  const updatePlaceholders = () => {
-    // Get a list of all placeholder elements
-    var placeholders = document.getElementsByClassName('fs-placeholder');
+  const updatePlaceholders = (items) => {
 
-    for (var i = 0; i < placeholders.length; i += 1) {
-      // Get the .fs-select parent element
-      var parent = getClosest(placeholders[i], '.fs-select');
+    let count = 0;
+    for (var i = 0; i < items.length; i += 1) {
+      const current = items[i];
+      const placeholder = current.querySelector('.fs-placeholder');
 
       // Get data-name attribute value from .fs-select element
-      var dataName = parent.attributes['data-name'].value;
+      var dataName = current.attributes['data-name'].value;
 
       // Use data-name to find the correct <select> element and its currently selected option's text
       var selectElement = document.getElementsByName(dataName)[0];
       var selectValue = selectElement.options[selectElement.selectedIndex].innerText;
 
       // Update placeholder with newly found text
-      placeholders[i].innerHTML = selectValue;
+      if (placeholder.innerHTML !== selectValue) {
+        placeholder.innerHTML = selectValue;
+        count =+ 1;
+      }
 
       // Update styling on the <li> element if it matches the current value
-      var listElements = parent.querySelectorAll('.fs-options .fs-options-list li');
+      var listElements = current.querySelectorAll('.fs-options .fs-options-list li');
       for (var j = 0; j < listElements.length; j += 1) {
         if (listElements[j].textContent === selectValue) {
           listElements[j].style.color = '#777777';
@@ -438,19 +479,24 @@ const updateFancySelects = (names) => {
         }
       }
     }
+
+    if (debugLevel > 0)
+      console.log(`Updated Fancy Select placeholder texts for ${count} elements.`)
   }
 
 
   /**
-   * Initialize all fancy-select element sizes.
+   * Initialize all Fancy Select DOM element sizes.
    * - Width is calculated from the data-width property set in each element
    * - Height is calculated from the number of options each element has
+   * @param {Array} items Array of Fancy Select DOM elements.
    */
-  const initializeSelectSizes = () => {
+  const initializeSelectSizes = (items) => {
     /* WIDTH */
-    // Set fancy-select element widths from their data-width properties
-    var fancySelects = document.getElementsByClassName('fs-select');
-    for (var i = 0; i < fancySelects.length; i += 1) {
+    // Set Fancy Select element widths from their data-width properties
+    // var fancySelects = document.getElementsByClassName('fs-select');
+    const fancySelects = items;
+    for (let i = 0; i < fancySelects.length; i += 1) {
       // Read target width from data-width attribute
       var targetWidth = fancySelects[i].attributes['data-width'].value;
 
@@ -461,58 +507,66 @@ const updateFancySelects = (names) => {
     /* HEIGHT */
     // Set how high each .fs-select::before element is based on how many options it contains
     // Start by dynamically creating an empty stylesheet at the document head
-    var styleElem = document.head.appendChild(document.createElement('style'));
+    const styleElem = document.head.appendChild(document.createElement('style'));
 
-    // Then loop through all the fancy-selects
-    for (var i = 0; i < fancySelects.length; i += 1) {
-      var current = fancySelects[i];
-      // Count number of list elements it has as children
-      var count = current.querySelectorAll('.fs-options .fs-options-list li').length;
+    // Then loop through all the Fancy Select elements.
+    let processedCount = 0;
+    for (let i = 0; i < fancySelects.length; i += 1) {
+      const current = fancySelects[i];
+      // Count number of <li> elements it has as children
+      let liCount = current.querySelectorAll('.fs-options .fs-options-list li').length;
       
-      // Give the current fancy-select a unique ID
-      var id = 'fs-unique-' + i;
+      // Give the current Fancy Select a unique ID
+      let id = 'fs-unique-' + i;
       // To make sure the ID is unique, keep giving it a suffix number until no similar ids are found within the document
-      var iteration = 0;
+      let iteration = 0;
       while (document.getElementById(id) !== null) {
         id = 'fs-unique-' + i + '-' + iteration;
       }
       current.setAttribute('id', id);
 
       // Add an entry to our new stylesheet (in the page head) concerning the ::before element of our fancy-select
-      var activeWidth = 1;
-      var activeHeight = count / 1.25;
-      var selector = '#' + id + '.fs-active::before';
-      var style = '{ transform: scale(' + activeWidth +', ' + activeHeight + '); }'
+      const activeWidth = 1;
+      const activeHeight = liCount / 1.25;
+      const selector = '#' + id + '.fs-active::before';
+      const style = '{ transform: scale(' + activeWidth +', ' + activeHeight + '); }'
       styleElem.innerHTML = styleElem.innerHTML + selector + style;
+
+      processedCount += 1;
     }
+
+    if (debugLevel > 0)
+      console.log(`Initialized size of ${processedCount} Fancy Select elements.`)
   }
 
 
 /**
- * Take a select elements and build a Fancy Selects from them
+ * Find <select> elements and build Fancy Selects from them, hiding the native <select> elements.
+ * @returns {Array} Array of Fancy Select DOM elements.
  */
 const init = () => {
   // Parse native <select> elements into JS objects
-  const { total, success, items } = parseSelects();
-
-  // Log how many were successfully parsed
-  console.log(`Found ${total} <select> elements and converted ${success} into objects.`);
-  console.log(items);
+  const items = parseSelects();
 
   // Construct a Fancy Select element from each object
-  createFancySelects(items);
+  const elements = createFancySelects(items);
+
+  if (debugLevel > 0)
+    console.log('Created DOM elements from FancySelect objects', elements);
+
+  return elements;
 }
 
 
 window.docReady(function() {  
   // Initialize fancy-select
-  init();
+  const fancySelectElements = init();
 
   // Initialize fancy-select element sizes
-  initializeSelectSizes();
+  initializeSelectSizes(fancySelectElements);
 
   // Update placeholder texts to select element values
-  updatePlaceholders();
+  updatePlaceholders(fancySelectElements);
 
   // Add event listeners to <select> elements just in case the user manages to change them.
   var selectElements = document.getElementsByClassName('fs-select-origin');
