@@ -275,29 +275,13 @@ const createFancySelects = (items) => {
       // Add Fancy Select
       sourceLocations[j].parentElement.appendChild(container);
       // Hide original <select>
-      // sourceLocations[j].style.display = 'none';
+      sourceLocations[j].style.display = 'none';
     }
 
     DOMElements.push(container);
   }
 
   return DOMElements;
-}
-
-
-/**
- * NOTE: Currently not implemented.
- * Update specified (or all) Fancy Select elements with values from fancySelects[].
- * @param {Array} names Element names that are to be updated. If empty, will update all.
- */
-const updateFancySelects = (names) => {
-  const elems = [];
-  if (names instanceof Array) {
-    console.log('[updateFancySelects] Parameter is an array', names);
-    // Find all Fancy Select elements
-  } else {
-    console.log('[updateFancySelects] Parameter is not an array. Updating all!', names);
-  }
 }
 
 
@@ -322,14 +306,7 @@ function handleSelect(event, parent, element) {
     }
   }
 
-  console.log('Closing parent', parent);
   parent.close();
-  // This might not be going to the ACTUAL parent element, but a copy of it. We need a reference to it!
-  // Get the real element right here and now
-  const theRealElement = document.querySelector(`.fs-select[data-name="${parent.getName()}"]`);
-  theRealElement.classList.remove('fs-active');
-  theRealElement.classList = ['fs-select'];
-  console.log(theRealElement.classList);
 
   // Update Fancy Select placeholders
   if (debugLevel > 1)
@@ -358,57 +335,10 @@ function handleSelect(event, parent, element) {
 
 
 /**
- * NOTE: Maybe redundant
- * Update underlying JavaScript select objects to reflect the element that was clicked.
- * @param {HTMLElement} elem Element that was clicked
- * @returns {Array} Names of the objects that were updated
- */
-const updateData = elem => {
-  // Get select element's name from parent
-  var name = getClosest(elem, '.fs-select').attributes['data-name'].value;
-  // Get selected item value
-  var value = elem.attributes['data-value'].value;
-
-  const updatedItems = [];
-  // Update underlying object with new selected index.
-  console.log(fancySelects);
-  for (let entry of fancySelects) {
-    // First find the right object(s)
-    if (entry.getName() === name) {
-      // Find index of newly selected value
-      const oldIndex = entry.getSelectedIndex();
-      const newIndex = entry.getOptions().indexOf(value);
-      if (newIndex !== -1 && !(oldIndex === newIndex)) {
-        entry.select(newIndex);
-        console.log(`Successfully updated selectedIndex from ${oldIndex} to ${newIndex}`);
-        updatedItems.push({
-          name: name,
-          index: newIndex,
-        });
-      } else {
-        console.log(`Didn't update ${oldIndex} to ${newIndex}`);
-      }
-    }
-  }
-
-  return updatedItems;
-
-  // Update all select elements with matching names to the new value
-  /*
-  var selects = document.getElementsByName(name);
-  for (var i = 0; i < selects.length; i += 1) {
-    selects[i].querySelector('option[value="' + value + '"]').selected = true;
-  }
-  */
-}
-
-
-/**
  * Update <select> elements.
  * @param {Array} items Element names and selected indices that were updated.
  */
 const updateSelectElements = (items) => {
-  console.log('Updating elements...', items);
   // Update native <select> elements.
   let nativeCollection = document.getElementsByTagName('select'); // Returns a HTMLCollection
 
@@ -429,19 +359,11 @@ const updateSelectElements = (items) => {
       }
     }
   }
-
-  // NOTE: Running updatePlaceholders here creates unnecessary work since it does DOM scraping.
-  // This function (updateSelectElements) knows which elements to update. Use that to our advantage here!
-  // updatePlaceholders();
-
-
-  // NOTE: Currently not implemented
-  // Update actual FancySelect elements
-  // updateFancySelects(items.map(i => i.name));
 }
 
 
 /**
+ * TODO: Refactor this so that all displayed values come from Fancy Select objects, not hidden <select> elements.
  * Update Fancy Select placeholder texts to reflect the currently selected option in their respective <select> elements.
  * @param {Array} items Array of Fancy Select DOM elements.
  */
