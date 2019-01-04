@@ -25,15 +25,6 @@ function FancySelect(name, options, texts, selectedIndex, openState) {
     for (let i = 0; i < elements.length; i += 1) {
       elements[i].classList.add('fs-active');
     }
-
-    // Close other Fancy Selects
-    for (let i = 0; i < fancySelects.length; i += 1) {
-      const item = fancySelects[i];
-      if (item.getName() !== name && item.getOpenState()) {
-        // If a differently named item is open, close 
-        item.close();
-      }
-    }
   }
 
   /**
@@ -67,28 +58,26 @@ function FancySelect(name, options, texts, selectedIndex, openState) {
 /**
  * Handle clicks on Fancy Selects (and other elements)
  * @param {*} event Click event
+ * @param {FancySelect} item Fancy Select object respective to the element that was clicked.
+ * @param {Array} fsObjects Array of Fancy Select objects.
  */
-function handleClick(event) {
+function handleClick(event, item, fsObjects) {
   event.stopPropagation();
-  if (this.hasOwnProperty('isGeneric') && this.isGeneric) {
+  if (item === null) {
     // User clicked somewhere else than a Fancy Select. Close all Fancy Selects!
-    for (let i = 0; i < fancySelects.length; i += 1) {
-      const item = fancySelects[i];
-      if (item.getOpenState()) {
-        item.close();
-      }
+    console.log('Generic click');
+    for (let i = 0; i < fsObjects.length; i += 1) {
+      fsObjects[i].close();
     }
   } else {
-    // User clicked a Fancy Select
-    const name = this.attributes['data-name'].value;
-    for (let i = 0; i < fancySelects.length; i += 1) {
-      // Go through all stored FancySelect objects
-      const item = fancySelects[i];
-      if (item.getName() === name) {
-        // Open the correct one
-        item.open();
+    // User clicked on a Fancy Select. Open the clicked element!
+    item.open();
+
+    // Close other Fancy Selects.
+    for (let i = 0; i < fsObjects.length; i += 1) {
+      if (fsObjects[i].getName() !== item.getName()) {
+        fsObjects[i].close();
       }
-      // Don't close the other, incorrect, Fancy Selects here. The open() function already does that.
     }
   }
 }
@@ -216,7 +205,7 @@ const parseSelects = () => {
 /**
  * Create DOM elements from FancySelect objects.
  * @param {Array} items Array of FancySelect objects.
- * @returns {*} Array of created DOM elements.
+ * @returns {Array} Array of Fancy Select DOM elements.
  */
 const createFancySelects = (items) => {
   const DOMElements = [];
@@ -280,7 +269,7 @@ const createFancySelects = (items) => {
       // Add Fancy Select
       sourceLocations[j].parentElement.appendChild(container);
       // Hide original <select>
-      sourceLocations[j].style.display = 'none';
+      // sourceLocations[j].style.display = 'none';
     }
 
     DOMElements.push(container);
@@ -341,9 +330,9 @@ const updateFancySelects = (names) => {
   }
 
 
-  function handleSelect() {
+  function handleSelect(item) {
     // Update underlying data objects
-    const updatedItems = updateData(this);
+    const updatedItems = updateData(item);
 
     // Update visible objects based on data that was changed
     if (updatedItems != undefined && updatedItems.length > 0) {
@@ -542,7 +531,7 @@ const updateFancySelects = (names) => {
 
 /**
  * Find <select> elements and build Fancy Selects from them, hiding the native <select> elements.
- * @returns {Array} Array of Fancy Select DOM elements.
+ * @returns {Object} Array of Fancy Select Objects (fsObjects) and array of Fancy Select DOM elements (fsElements).
  */
 const init = () => {
   // Parse native <select> elements into JS objects
@@ -554,52 +543,63 @@ const init = () => {
   if (debugLevel > 0)
     console.log('Created DOM elements from FancySelect objects', elements);
 
-  return elements;
+  return {
+    fsObjects: items,
+    fsElements: elements,
+  };
 }
 
 
 window.docReady(function() {  
   // Initialize fancy-select
-  const fancySelectElements = init();
+  const { fsObjects, fsElements } = init();
 
   // Initialize fancy-select element sizes
-  initializeSelectSizes(fancySelectElements);
+  initializeSelectSizes(fsElements);
 
   // Update placeholder texts to select element values
-  updatePlaceholders(fancySelectElements);
+  updatePlaceholders(fsElements);
 
   // Add event listeners to <select> elements just in case the user manages to change them.
   var selectElements = document.getElementsByClassName('fs-select-origin');
   for (var i = 0; i < selectElements.length; i += 1) {
-    selectElements[i].onchange = updatePlaceholders;
+    selectElements[i].onchange = () => updatePlaceholders(fsElements);
   }
 
   // When a <li> element is clicked
   // Find all .fs-options-list elements
-  var listElements = document.querySelectorAll('.fs-options-list li');
-  for (var i = 0; i < listElements.length; i += 1) {
-    // Add click and keydown handlers
-    listElements[i].onclick = handleSelect;
-    listElements[i].keydown = handleSelect;
-  }  
+  // var listElements = document.querySelectorAll('.fs-options-list li');
+  // for (var i = 0; i < listElements.length; i += 1) {
+  //   // Add click and keydown handlers
+  //   listElements[i].onclick = handleSelect;
+  //   listElements[i].keydown = handleSelect;
+  // }
 
-  var className = 'fs-select';
+  for (let i = 0; i < fsElements.length; i += 1) {
+    const listElements = fsElements[i].querySelectorAll('.fs-options-list li');
+    for (let j = 0; j < listElements.length; j += 1) {
+      // Add click and keydown handlers
+      listElements[j].onclick = () => handleSelect(fsElements[i]);
+      listElements[j].keydown = () => handleSelect(fsElements[i]);
+    }
+  }
 
-  // Toggle '.fs-select' active state when it is clicked.
-  var fs_elements = document.getElementsByClassName(className);
-  if (fs_elements && typeof fs_elements !== 'undefined') {
-    for (var i = 0; i < fs_elements.length; i += 1) {
+  // Toggle Fancy Select active state when it is clicked.
+  if (fsElements && typeof fsElements !== 'undefined') {
+    for (let i = 0; i < fsElements.length; i += 1) {
       // Add click and keydown event listeners.
       // fs_elements[i].onclick = toggleActive.bind(fs_elements[i]);
       // fs_elements[i].keydown = toggleActive.bind(fs_elements[i]);
+      const obj = fsObjects[i];
+      const element = fsElements[i];
 
-      fs_elements[i].onclick = handleClick.bind(fs_elements[i]);
-      fs_elements[i].keydown = handleClick.bind(fs_elements[i]);
+      element.onclick = (event) => handleClick(event, obj, fsObjects);
+      element.keydown = (event) => handleClick(event, obj, fsObjects);
     }
   } else {
     console.log('Could not find any elements with class name ' + className);
   }
+
+  // When the document body is clicked, close all Fancy Selects
+  document.body.addEventListener('click', (event) => handleClick(event, null, fsObjects));
 });
-
-
-document.body.addEventListener('click', handleClick.bind({ isGeneric: true }));
