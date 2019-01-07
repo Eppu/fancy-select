@@ -85,6 +85,19 @@ function handleClick(event, item, fsObjects) {
 
     if (!isClickEvent || targetIsPlaceholder) {
       item.open();
+      console.log(event.type, item.getName());
+
+      if(event.type === 'focus') {
+        // Set focus on the currently selected option
+        const options = document.querySelectorAll(`.fs-select[data-name="${item.getName()}"] .fs-options-list li`);
+        // console.log('Setting focus on' + item.getSelectedIndex(), options[item.getSelectedIndex()]);
+        options[item.getSelectedIndex()].focus();
+
+        // Remove tabindex from parent
+        const parent = document.querySelector(`.fs-select[data-name="${item.getName()}"]`);
+        console.log('Setting tabindex -1 of ', parent);
+        setAtt(parent, 'tabindex', -1);
+      }
 
       // Close other Fancy Selects.
       for (let i = 0; i < fsObjects.length; i += 1) {
@@ -234,8 +247,9 @@ const createFancySelects = (items) => {
     setAtt(container, 'data-name', items[i].getName()) // data-name
     // Data-width
     setAtt(container, 'data-width', '7.5');
-
-
+    // Make tab-navigable
+    setAtt(container, 'tabindex', '0');
+    
     // PLACEHOLDER
     const ph = document.createElement('span');
     setAtt(ph, 'class', 'fs-placeholder');
@@ -261,6 +275,7 @@ const createFancySelects = (items) => {
     // Create all different options
     for(let j = 0; j < items[i].getOptions().length; j += 1) {
       const opt = document.createElement('li');
+      setAtt(opt, 'tabindex', -1); // Let scripts focus these options. Needed for keyboard navigation.
       setAtt(opt, 'data-value', items[i].getOptions()[j]);
       try {
         // Add text to option.
@@ -474,12 +489,38 @@ window.docReady(function() {
     selectElements[i].addEventListener('change', () => updatePlaceholder(fsObjects[i], fsElements[i]));
   }
 
+  // Add event listeners to Fancy Select options.
   for (let i = 0; i < fsElements.length; i += 1) {
     const listElements = fsElements[i].querySelectorAll('.fs-options-list li');
     for (let j = 0; j < listElements.length; j += 1) {
-      // Add click and keydown handlers
-      listElements[j].addEventListener('click', event => handleSelect(event, fsObjects[i], fsElements[i]));
-      listElements[j].addEventListener('keydown', event => handleSelect(event, fsObjects[i], fsElements[i]));
+      const child = listElements[j];
+      const item = fsObjects[i];
+      const element = fsElements[i];
+
+      // Add click handlers
+      child.addEventListener('click', event => handleSelect(event, fsObjects[i], fsElements[i]));
+      // child.addEventListener('keydown', event => handleSelect(event, fsObjects[i], fsElements[i]));
+      child.addEventListener('blur', (event) => {
+        console.log('Blurred ' + item.getName());
+        setAtt(element, 'tabindex', '0');
+      });
+
+      // Add mouse key listeners
+      child.addEventListener('keydown', (event) => {
+        let indexToFocus = item.getSelectedIndex();
+        switch (event.keyCode) {
+          case 38: // Up
+            indexToFocus = Math.max(j-1, 0);
+            listElements[indexToFocus].focus();
+            break;
+          case 40: // Down
+            indexToFocus = Math.min(j+1, listElements.length-1);
+            listElements[indexToFocus].focus();
+            break;
+          default:
+            break;
+        }
+      })
     }
   }
 
@@ -491,7 +532,8 @@ window.docReady(function() {
       const element = fsElements[i];
 
       element.addEventListener('click', event => handleClick(event, obj, fsObjects));
-      element.addEventListener('keydown', event => handleClick(event, obj, fsObjects));
+      // element.addEventListener('keydown', event => handleClick(event, obj, fsObjects));
+      element.addEventListener('focus', event => handleClick(event, obj, fsObjects));
     }
   } else {
     console.log('Didn\'t find any Fancy Selects to add click and keydown handlers to.');
@@ -504,4 +546,5 @@ window.docReady(function() {
   document.querySelector('.fs-go').addEventListener('click', event => {
     console.log(fsObjects.map(item => item.getText(item.getSelectedIndex())));
   });
+
 });
