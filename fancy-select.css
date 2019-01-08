@@ -248,7 +248,7 @@
   transition: transform cubic-bezier(0.500, 0.500, 0.500, 0.950) 250ms;
 }
 
-.fs-go:hover {
+.fs-go:hover, .fs-go:focus {
   -webkit-transform: scale(1.1, 1.1);
       -ms-transform: scale(1.1, 1.1);
           transform: scale(1.1, 1.1);
@@ -267,7 +267,7 @@
   transition: bottom cubic-bezier(0.500, 0.500, 0.500, 0.950) 250ms;
 }
 
-.fs-go:hover::after {
+.fs-go:hover::after, .fs-go:focus::after {
   bottom: -5px;
 }
 
@@ -327,7 +327,8 @@
   display: none;
 }
 
-.fs-go:hover .fs-go-spark {
+.fs-go:hover .fs-go-spark,
+.fs-go:focus .fs-go-spark {
   visibility: visible;
 }
 

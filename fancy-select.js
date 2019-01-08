@@ -69,7 +69,7 @@ function FancySelect(name, options, texts, selectedIndex, openState) {
  * Handle clicks on Fancy Selects (and other elements)
  * @param {*} event Click event
  * @param {FancySelect} item Fancy Select object respective to the element that was clicked.
- * @param {Array} fsObjects Array of Fancy Select objects.
+ * @param {Array} fsObjects Array of all Fancy Select objects.
  */
 function handleClick(event, item, fsObjects) {
   event.stopPropagation();
@@ -80,22 +80,9 @@ function handleClick(event, item, fsObjects) {
     }
   } else {
     // User clicked on a Fancy Select. We only want to open if they clicked on the placeholder.
-    const isClickEvent = event.type === 'click';
     const targetIsPlaceholder = event.target.classList.contains('fs-placeholder');
-
-    if (!isClickEvent || targetIsPlaceholder) {
+    if (targetIsPlaceholder) {
       item.open();
-
-      if(event.type === 'focus') {
-        // Set focus on the currently selected option
-        const options = document.querySelectorAll(`.fs-select[data-name="${item.getName()}"] .fs-options-list li`);
-        // console.log('Setting focus on' + item.getSelectedIndex(), options[item.getSelectedIndex()]);
-        options[item.getSelectedIndex()].focus();
-
-        // Remove tabindex from parent
-        const parent = document.querySelector(`.fs-select[data-name="${item.getName()}"]`);
-        setAtt(parent, 'tabindex', -1);
-      }
 
       // Close other Fancy Selects.
       for (let i = 0; i < fsObjects.length; i += 1) {
@@ -104,6 +91,50 @@ function handleClick(event, item, fsObjects) {
         }
       }
     }
+  }
+}
+
+/**
+ * Handle focusing of Fancy Select elements.
+ * @param {*} event Focus event
+ * @param {FancySelect} item Fancy Select object respective to the element that was focused.
+ * @param {Array} fsObjects Array of all Fancy Select objects.
+ */
+function handleFocus(event, item, fsObjects) {
+  event.stopPropagation();
+  item.open();
+
+  // Set focus on the currently selected option
+  const options = document.querySelectorAll(`.fs-select[data-name="${item.getName()}"] .fs-options-list li`);
+  options[item.getSelectedIndex()].focus();
+
+  // Remove tabindex from parent
+  const parent = document.querySelector(`.fs-select[data-name="${item.getName()}"]`);
+  setAtt(parent, 'tabindex', -1);
+
+  // Close other Fancy Selects.
+  for (let i = 0; i < fsObjects.length; i += 1) {
+    if (fsObjects[i].getName() !== item.getName()) {
+      fsObjects[i].close();
+    }
+  }
+}
+
+
+/**
+ * Handle blurring of Fancy Select option elements.
+ * @param {*} event Blur event.
+ * @param {FancySelect} item This Fancy Select object.
+ * @param {*} element Fancy Select element whose option was blurred.
+ */
+function handleBlur(event, item, element) {
+  // Find out where focus went
+  const focusTarget = event.relatedTarget;
+
+  // If an option of this Fancy Select was focused, do nothing. Otherwise set this Fancy Select's tabindex to 0.
+  if (!element.contains(focusTarget)) {
+    item.close();
+    setAtt(element, 'tabindex', '0');
   }
 }
 
@@ -309,30 +340,34 @@ const createFancySelects = (items) => {
 /**
  * Handle what happens when the user selects a dropdown value.
  * @param {*} event Click event
- * @param {FancySelect} parent The Fancy Select object whose option was clicked.
+ * @param {FancySelect} item The Fancy Select object whose option was clicked.
  * @param {*} element The Fancy Select DOM element whose option was clicked.
  */
-function handleSelect(event, parent, element) {
+function handleSelect(event, item, element) {
   // Get the newly clicked value.
   const value = event.target.attributes['data-value'].value;
 
   // Find the value in the Fancy Select object's options array.
-  for (let i = 0; i < parent.getOptions().length; i += 1) {
-    if (parent.getOptions()[i] === value) {
+  for (let i = 0; i < item.getOptions().length; i += 1) {
+    if (item.getOptions()[i] === value) {
       // Select the new option with the matching index we found.
-      parent.select(i);
+      item.select(i);
 
       // Update the native <select> element's selected value.
-      updateSelectElements({ name: parent.getName(), index: i });
+      updateSelectElements({ name: item.getName(), index: i });
     }
   }
 
-  parent.close();
+  // Don't close the Fancy Select if the keyboard was used to select an option.
+  // The element should close when focus is moved elsewhere.
+  if (event.type !== 'keydown') {
+    item.close();
+  }
 
   // Update Fancy Select placeholders
   if (debugLevel > 1)
     console.log('Updating placeholder text for', element);
-  updatePlaceholder(parent, element);
+  updatePlaceholder(item, element);
 
   return;
 }
@@ -496,18 +531,10 @@ window.docReady(function() {
       const element = fsElements[i];
 
       // Add click handlers
-      child.addEventListener('click', event => handleSelect(event, fsObjects[i], fsElements[i]));
-      child.addEventListener('blur', (event) => {
-        // Find out where focus went
-        const focusTarget = event.relatedTarget;
+      child.addEventListener('click', event => handleSelect(event, item, element));
+      child.addEventListener('blur', event => handleBlur(event, item, element));
 
-        // If an option of this Fancy Select was focused, do nothing. Otherwise set this Fancy Select's tabindex to 0.
-        if (!element.contains(focusTarget)) {
-          setAtt(element, 'tabindex', '0');
-        }
-      });
-
-      // Add arrow key listeners
+      // Add enter and arrow key listeners
       child.addEventListener('keydown', (event) => {
         let indexToFocus = item.getSelectedIndex();
         switch (event.keyCode) {
@@ -518,6 +545,9 @@ window.docReady(function() {
           case 40: // Down
             indexToFocus = Math.min(j+1, listElements.length-1);
             listElements[indexToFocus].focus();
+            break;
+          case 13: // Enter
+            handleSelect(event, item, element);
             break;
           default:
             break;
@@ -534,7 +564,7 @@ window.docReady(function() {
       const element = fsElements[i];
 
       element.addEventListener('click', event => handleClick(event, obj, fsObjects));
-      element.addEventListener('focus', event => handleClick(event, obj, fsObjects));
+      element.addEventListener('focus', event => handleFocus(event, obj, fsObjects));
     }
   } else {
     console.log('Didn\'t find any Fancy Selects to add click and keydown handlers to.');
