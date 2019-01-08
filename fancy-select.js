@@ -85,7 +85,6 @@ function handleClick(event, item, fsObjects) {
 
     if (!isClickEvent || targetIsPlaceholder) {
       item.open();
-      console.log(event.type, item.getName());
 
       if(event.type === 'focus') {
         // Set focus on the currently selected option
@@ -95,7 +94,6 @@ function handleClick(event, item, fsObjects) {
 
         // Remove tabindex from parent
         const parent = document.querySelector(`.fs-select[data-name="${item.getName()}"]`);
-        console.log('Setting tabindex -1 of ', parent);
         setAtt(parent, 'tabindex', -1);
       }
 
@@ -239,7 +237,7 @@ const createFancySelects = (items) => {
 
   for(let i = 0; i < items.length; i += 1) {
     if (debugLevel > 1)
-      console.log('Creating fancy select', items[i]);
+      console.log('Creating Fancy Select', items[i]);
 
     // CONTAINER
     const container = document.createElement('div');
@@ -499,13 +497,17 @@ window.docReady(function() {
 
       // Add click handlers
       child.addEventListener('click', event => handleSelect(event, fsObjects[i], fsElements[i]));
-      // child.addEventListener('keydown', event => handleSelect(event, fsObjects[i], fsElements[i]));
       child.addEventListener('blur', (event) => {
-        console.log('Blurred ' + item.getName());
-        setAtt(element, 'tabindex', '0');
+        // Find out where focus went
+        const focusTarget = event.relatedTarget;
+
+        // If an option of this Fancy Select was focused, do nothing. Otherwise set this Fancy Select's tabindex to 0.
+        if (!element.contains(focusTarget)) {
+          setAtt(element, 'tabindex', '0');
+        }
       });
 
-      // Add mouse key listeners
+      // Add arrow key listeners
       child.addEventListener('keydown', (event) => {
         let indexToFocus = item.getSelectedIndex();
         switch (event.keyCode) {
@@ -532,7 +534,6 @@ window.docReady(function() {
       const element = fsElements[i];
 
       element.addEventListener('click', event => handleClick(event, obj, fsObjects));
-      // element.addEventListener('keydown', event => handleClick(event, obj, fsObjects));
       element.addEventListener('focus', event => handleClick(event, obj, fsObjects));
     }
   } else {

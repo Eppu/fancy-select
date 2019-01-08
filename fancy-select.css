@@ -139,6 +139,8 @@
   -webkit-margin-after: 0;
   -webkit-padding-before: 0;
   -webkit-padding-after: 0;
+  padding-inline-start: 0;
+  padding-inline-end: 0;
 
   list-style-type: none;
   pointer-events: none;
