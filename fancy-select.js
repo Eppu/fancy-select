@@ -132,7 +132,7 @@ function handleBlur(event, item, element) {
   const focusTarget = event.relatedTarget;
 
   // If an option of this Fancy Select was focused, do nothing. Otherwise set this Fancy Select's tabindex to 0.
-  if (!element.contains(focusTarget)) {
+  if (focusTarget == undefined || !element.contains(focusTarget)) {
     item.close();
     setAtt(element, 'tabindex', '0');
   }
@@ -420,9 +420,10 @@ const updatePlaceholder = (obj, element) => {
   var listElements = element.querySelectorAll('.fs-options .fs-options-list li');
   for (var j = 0; j < listElements.length; j += 1) {
     if (listElements[j].textContent === newValue) {
-      listElements[j].style.color = '#777777';
+      // listElements[j].style.color = '#777777';
+      setAtt(listElements[j], 'selected', 'selected');
     } else {
-      listElements[j].removeAttribute('style');
+      listElements[j].removeAttribute('selected');
     }
   }
 }
@@ -432,32 +433,38 @@ const updatePlaceholder = (obj, element) => {
  * Initialize all Fancy Select DOM element sizes.
  * - Width is calculated from the data-width property set in each element
  * - Height is calculated from the number of options each element has
- * @param {Array} items Array of Fancy Select DOM elements.
+ * @param {Array} elements Array of Fancy Select DOM elements.
  */
-const initializeSelectSizes = (items) => {
-  /* WIDTH */
-  // Set Fancy Select element widths from their data-width properties
-  // var fancySelects = document.getElementsByClassName('fs-select');
-  const fancySelects = items;
-  for (let i = 0; i < fancySelects.length; i += 1) {
-    // Read target width from data-width attribute
-    var targetWidth = fancySelects[i].attributes['data-width'].value;
-
-    // Apply width as a style
-    fancySelects[i].style.width = targetWidth + 'em';
-  }
-
-  /* HEIGHT */
-  // Set how high each .fs-select::before element is based on how many options it contains
+const initializeSelectSizes = (elements) => {
   // Start by dynamically creating an empty stylesheet at the document head
   const styleElem = document.head.appendChild(document.createElement('style'));
-
   // Then loop through all the Fancy Select elements.
   let processedCount = 0;
-  for (let i = 0; i < fancySelects.length; i += 1) {
-    const current = fancySelects[i];
+  
+  // WIDTH
+  // Set Fancy Select element widths from their data-width properties
+  for (let i = 0; i < elements.length; i += 1) {
+    const current = elements[i];
+
+    // Approximate a width for our Fancy Selectbased on the longest option text.
+    const options = current.querySelectorAll('.fs-options-list li');
+    let maxWidth = 0;
+
+    // Get the longest option string
+    for (let j = 0; j < options.length; j += 1) {
+      const option = options[j];
+      maxWidth = Math.max(maxWidth, option.textContent.length);
+    }
+
+    // Calculate and apply the new width
+    const newWidth = Math.round((maxWidth * 0.5) + 4.5);
+    current.style.width = newWidth + 'em';
+
+
+    // HEIGHT
+    // Set how high each .fs-select::before element is based on how many options it contains
     // Count number of <li> elements it has as children
-    let liCount = current.querySelectorAll('.fs-options .fs-options-list li').length;
+    let liCount = options.length;
     
     // Give the current Fancy Select a unique ID
     let id = 'fs-unique-' + i;
@@ -468,18 +475,23 @@ const initializeSelectSizes = (items) => {
     }
     current.setAttribute('id', id);
 
+    // Do some math concerning the height
+    const h = options[0].offsetHeight;
+    const beforeDefaultHeight = current.querySelector('.fs-placeholder').offsetHeight;
+
     // Add an entry to our new stylesheet (in the page head) concerning the ::before element of our fancy-select
     const activeWidth = 1;
-    const activeHeight = liCount / 1.25;
+    // const activeHeight = liCount / 1.25;
+    const activeHeight = (liCount * (h / beforeDefaultHeight)) + 0.5;
     const selector = '#' + id + '.fs-active::before';
     const style = '{ transform: scale(' + activeWidth +', ' + activeHeight + '); }'
     styleElem.innerHTML = styleElem.innerHTML + selector + style;
 
     processedCount += 1;
-  }
 
-  if (debugLevel > 0)
-    console.log(`Initialized size of ${processedCount} Fancy Select elements.`)
+    if (debugLevel > 0)
+      console.log(`Initialized size of ${processedCount} Fancy Select elements.`)
+  }
 }
 
 
@@ -522,7 +534,7 @@ window.docReady(function() {
     selectElements[i].addEventListener('change', () => updatePlaceholder(fsObjects[i], fsElements[i]));
   }
 
-  // Add event listeners to Fancy Select options.
+  // Add event listeners to Fancy Select OPTIONS.
   for (let i = 0; i < fsElements.length; i += 1) {
     const listElements = fsElements[i].querySelectorAll('.fs-options-list li');
     for (let j = 0; j < listElements.length; j += 1) {
@@ -534,7 +546,7 @@ window.docReady(function() {
       child.addEventListener('click', event => handleSelect(event, item, element));
       child.addEventListener('blur', event => handleBlur(event, item, element));
 
-      // Add enter and arrow key listeners
+      // Add keyboard key listeners
       child.addEventListener('keydown', (event) => {
         let indexToFocus = item.getSelectedIndex();
         switch (event.keyCode) {
@@ -543,10 +555,21 @@ window.docReady(function() {
             listElements[indexToFocus].focus();
             break;
           case 40: // Down
-            indexToFocus = Math.min(j+1, listElements.length-1);
+            indexToFocus = Math.min(j+1, listElements.length - 1);
+            listElements[indexToFocus].focus();
+            break;
+          case 35: // End
+            indexToFocus = listElements.length - 1;
+            listElements[indexToFocus].focus();
+            break;
+          case 36: // Home
+            indexToFocus = 0;
             listElements[indexToFocus].focus();
             break;
           case 13: // Enter
+            handleSelect(event, item, element);
+            break;
+          case 32: // Space
             handleSelect(event, item, element);
             break;
           default:
@@ -576,6 +599,7 @@ window.docReady(function() {
   // Make the "GO" button do something
   document.querySelector('.fs-go').addEventListener('click', event => {
     console.log(fsObjects.map(item => item.getText(item.getSelectedIndex())));
+    event.target.blur();
   });
 
 });
