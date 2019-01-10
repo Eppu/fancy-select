@@ -102,6 +102,13 @@
   transition:
     transform cubic-bezier(0.500, 0.500, 0.500, 0.950) 370ms,
     text-indent cubic-bezier(0.500, 0.500, 0.500, 0.950) 370ms;
+
+  -webkit-touch-callout: none;
+    -webkit-user-select: none;
+     -khtml-user-select: none;
+       -moz-user-select: none;
+        -ms-user-select: none;
+            user-select: none;
 }
 
 .fs-placeholder::after {
@@ -169,6 +176,13 @@
   white-space: nowrap;
   -o-text-overflow: ellipsis;
      text-overflow: ellipsis;
+
+  -webkit-touch-callout: none;
+    -webkit-user-select: none;
+     -khtml-user-select: none;
+       -moz-user-select: none;
+        -ms-user-select: none;
+            user-select: none;
 }
 
 /* Light theme */
@@ -193,15 +207,6 @@
     opacity cubic-bezier(0.500, 0.500, 0.500, 0.950) 250ms
   ;
 }
-
-.fs-options-list li:first-of-type {
-  /* padding-top: 0.8em; */
-}
-
-.fs-options-list li:last-of-type {
-  /* padding-bottom: 0.8em; */
-}
-
 
 /* Animate out delays */
 .fs-options li:nth-of-type(1) { -webkit-transition-delay: 0; -o-transition-delay: 0; transition-delay: 0; }

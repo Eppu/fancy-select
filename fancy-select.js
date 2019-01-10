@@ -1,3 +1,5 @@
+"use strict";
+
 /**
  * FancySelect data structure with methods for getting and setting data
  * @param {string} name Element name
@@ -308,10 +310,10 @@ const createFancySelects = (items) => {
       setAtt(opt, 'data-value', items[i].getOptions()[j]);
       try {
         // Add text to option.
-        optTextNode = document.createTextNode(items[i].getTexts()[j]);
+        const optTextNode = document.createTextNode(items[i].getTexts()[j]);
         opt.appendChild(optTextNode);
       } catch (e) {
-        console.warn(`Select element named ${items[i].getName()} has unequal amounts of options and texts. Check that each option has a value attribute and text content.`);
+        console.warn(`Select element ${items[i].getName() || ''} has unequal amounts of options and texts. Check that each option has a value attribute and text content.`, e);
       }
 
       // Add created <li> element to <ul> wrapper.
@@ -385,8 +387,8 @@ const updateSelectElements = (items) => {
     items = [items];
   }
 
-  for (n of nativeCollection) {
-    for (i of items) {
+  for (let n of nativeCollection) {
+    for (let i of items) {
       // Only modify elements that have changed.
       if (n.name === i.name) {
         // Remove 'selected' attribute from old option
@@ -413,7 +415,6 @@ const updatePlaceholder = (obj, element) => {
   // Update placeholder with newly found text
   if (placeholder.innerHTML !== newValue) {
     placeholder.innerHTML = newValue;
-    count =+ 1;
   }
 
   // Update styling on the <li> element if it matches the current value
