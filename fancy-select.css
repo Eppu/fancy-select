@@ -307,11 +307,14 @@
   transition: transform cubic-bezier(0.500, 0.500, 0.500, 0.950) 250ms;
 }
 
-.fs-go:hover,
-.fs-go:focus {
+.fs-go:hover {
   -webkit-transform: scale(1.1, 1.1);
       -ms-transform: scale(1.1, 1.1);
           transform: scale(1.1, 1.1);
+  outline: none;
+}
+
+.fs-go:focus {
   outline: none;
 }
 
@@ -330,85 +333,4 @@
 
 .fs-go:hover::after, .fs-go:focus::after {
   bottom: -5px;
-}
-
-.fs-go-sparks {
-  overflow: hidden;
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-}
-
-.fs-go-spark {
-  width: 200px;
-  height: 2px;
-  pointer-events: none;
-  -webkit-user-select: none;
-     -moz-user-select: none;
-      -ms-user-select: none;
-          user-select: none;
-  position: absolute;
-  left: 0;
-  -webkit-transform: translateX(50vw);
-      -ms-transform: translateX(50vw);
-          transform: translateX(50vw);
-  z-index: 0;
-
-  visibility: hidden; /* FF3.6-15 */
-  background: -webkit-linear-gradient(left, rgba(255,255,255,1) 0%,rgba(255,255,255,0) 100%); /* Chrome10-25,Safari5.1-6 */
-  background: -webkit-gradient(linear, left top, right top, from(rgba(255,255,255,1)),to(rgba(255,255,255,0)));
-  background: -o-linear-gradient(left, rgba(255,255,255,1) 0%,rgba(255,255,255,0) 100%);
-  background: linear-gradient(to right, rgba(255,255,255,1) 0%,rgba(255,255,255,0) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#00ffffff',GradientType=1 ); /* IE6-9 */
-
-  -webkit-animation-name: spark;
-          animation-name: spark;
-  -webkit-animation-duration: 1s;
-          animation-duration: 1s;
-  -webkit-animation-iteration-count: infinite;
-          animation-iteration-count: infinite;
-  -webkit-animation-timing-function: linear;
-          animation-timing-function: linear;
-}
-
-.fs-go-spark::before {
-  content: '';
-  width: 7px;
-  height: 7px;
-  background-color: white;
-  /* border-radius: 50%; */
-  position: absolute;
-  left: 0;
-  top: 1px;
-  -webkit-transform: translateY(-50%) rotate(45deg);
-      -ms-transform: translateY(-50%) rotate(45deg);
-          transform: translateY(-50%) rotate(45deg);
-  display: none;
-}
-
-.fs-go:hover .fs-go-spark,
-.fs-go:focus .fs-go-spark {
-  visibility: visible;
-}
-
-.fs-go .fs-go-spark:nth-of-type(1) { -webkit-animation-delay: 0.3s; animation-delay: 0.3s; }
-.fs-go .fs-go-spark:nth-of-type(2) { -webkit-animation-delay: 0.1s; animation-delay: 0.1s; }
-.fs-go .fs-go-spark:nth-of-type(3) { -webkit-animation-delay: 0.8s; animation-delay: 0.8s; }
-.fs-go .fs-go-spark:nth-of-type(4) { -webkit-animation-delay: 0.5s; animation-delay: 0.5s; }
-.fs-go .fs-go-spark:nth-of-type(5) { -webkit-animation-delay: 0.9s; animation-delay: 0.9s; }
-
-.fs-go span {
-  z-index: 1;
-}
-
-@-webkit-keyframes spark {
-  from { -webkit-transform: translateX(50vw); transform: translateX(50vw); }
-  to { -webkit-transform: translateX(-webkit-calc(-50vw - 100%)); transform: translateX(calc(-50vw - 100%)); }
-}
-
-@keyframes spark {
-  from { -webkit-transform: translateX(50vw); transform: translateX(50vw); }
-  to { -webkit-transform: translateX(-webkit-calc(-50vw - 100%)); transform: translateX(calc(-50vw - 100%)); }
 }

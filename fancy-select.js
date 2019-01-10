@@ -280,6 +280,9 @@ const createFancySelects = (items) => {
     setAtt(container, 'data-width', '7.5');
     // Make tab-navigable
     setAtt(container, 'tabindex', '0');
+    // Aria elements
+    setAtt(container, 'role', 'listbox');
+    setAtt(container, 'aria-label', items[i].getName());
     
     // PLACEHOLDER
     const ph = document.createElement('span');
@@ -307,6 +310,7 @@ const createFancySelects = (items) => {
     for(let j = 0; j < items[i].getOptions().length; j += 1) {
       const opt = document.createElement('li');
       setAtt(opt, 'tabindex', -1); // Let scripts focus these options. Needed for keyboard navigation.
+      setAtt(opt, 'role', 'option');
       setAtt(opt, 'data-value', items[i].getOptions()[j]);
       try {
         // Add text to option.
@@ -394,9 +398,12 @@ const updateSelectElements = (items) => {
         // Remove 'selected' attribute from old option
         const oldSelectedOption = ( n.querySelector('option[selected]') || n.querySelector('option[selected="selected"]') );
         oldSelectedOption.removeAttribute('selected');
+        oldSelectedOption.removeAttribute('aria-selected');
 
         // Set new option as selected
-        setAtt(n.getElementsByTagName('option')[i.index], 'selected', 'selected');
+        const newOption = n.getElementsByTagName('option')[i.index];
+        setAtt(newOption, 'selected', 'selected');
+        setAtt(newOption, 'aria-selected', 'true');
       }
     }
   }
@@ -417,14 +424,15 @@ const updatePlaceholder = (obj, element) => {
     placeholder.innerHTML = newValue;
   }
 
-  // Update styling on the <li> element if it matches the current value
+  // Update selected state on the <li> element if it matches the current value
   var listElements = element.querySelectorAll('.fs-options .fs-options-list li');
   for (var j = 0; j < listElements.length; j += 1) {
     if (listElements[j].textContent === newValue) {
-      // listElements[j].style.color = '#777777';
       setAtt(listElements[j], 'selected', 'selected');
+      setAtt(listElements[j], 'aria-selected', 'true');
     } else {
       listElements[j].removeAttribute('selected');
+      listElements[j].removeAttribute('aria-selected');
     }
   }
 }
@@ -600,7 +608,7 @@ window.docReady(function() {
   // Make the "GO" button do something
   document.querySelector('.fs-go').addEventListener('click', event => {
     console.log(fsObjects.map(item => item.getText(item.getSelectedIndex())));
-    event.target.blur();
+    this.blur();
   });
 
 });
